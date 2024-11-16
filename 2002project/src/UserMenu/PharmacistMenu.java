@@ -5,7 +5,6 @@ import Info.Pharmacist;
 import java.util.Scanner;
 
 public class PharmacistMenu {
-
     private static Pharmacist pharmacist;
 
     public static void setPharmacist(Pharmacist pharmacistUser) {
@@ -23,6 +22,11 @@ public class PharmacistMenu {
     }
 
     public static void handleChoice(int choice) {
+        if (pharmacist == null) {
+            System.out.println("Error: Pharmacist user not set. Please log in again.");
+            return;
+        }
+
         Scanner scanner = new Scanner(System.in);
 
         switch (choice) {
@@ -43,11 +47,8 @@ public class PharmacistMenu {
                 scanner.nextLine(); // Consume newline
                 pharmacist.submitReplenishmentRequest(medicineName, additionalStock);
             }
-            case 5 -> {
-                System.out.println("Logging out..." );
-            }
+            case 5 -> System.out.println("Logging out...");
             default -> System.out.println("Invalid choice. Please try again.");
-
         }
     }
 }

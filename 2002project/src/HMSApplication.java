@@ -2,6 +2,7 @@ import UserMenu.AdministratorMenu;
 import UserMenu.DoctorMenu;
 import UserMenu.PatientMenu;
 import UserMenu.PharmacistMenu;
+import Info.Pharmacist;
 import Info.Patient;
 import Info.MedicalRecord;
 
@@ -156,44 +157,65 @@ public class HMSApplication {
         boolean running = true;
         Scanner scanner = new Scanner(System.in);
 
+        // 根据用户角色初始化并设置 Pharmacist 对象
+        Pharmacist pharmacist = null;
+        if ("Info.Pharmacist".equals(userRole)) {
+            // 获取相关信息以初始化 Pharmacist 对象
+            Map<String, String> pharmacistData = staffData.get(userID);
+            if (pharmacistData != null) {
+                String role = pharmacistData.get("Role"); // Role from staffData map
+                pharmacist = new Pharmacist(userID, "password", role);
+                PharmacistMenu.setPharmacist(pharmacist);
+            } else {
+                System.out.println("Error: Pharmacist data not found.");
+                return;
+            }
+        }
+
         while (running) {
             switch (userRole) {
-                case "Info.Patient":
+                case "Info.Patient" -> {
                     PatientMenu.displayMenu();
                     int patientChoice = scanner.nextInt();
                     scanner.nextLine(); // Consume newline
                     PatientMenu.handleChoice(patientChoice);
                     if (patientChoice == 9) running = false; // Logout
-                    break;
+                }
 
-                case "Info.Doctor":
+                case "Info.Doctor" -> {
                     DoctorMenu.displayMenu();
                     int doctorChoice = scanner.nextInt();
                     scanner.nextLine(); // Consume newline
                     DoctorMenu.handleChoice(doctorChoice);
                     if (doctorChoice == 8) running = false; // Logout
-                    break;
+                }
 
-                case "Info.Pharmacist":
-                    PharmacistMenu.displayMenu();
-                    int pharmacistChoice = scanner.nextInt();
-                    scanner.nextLine(); // Consume newline
-                    PharmacistMenu.handleChoice(pharmacistChoice);
-                    if (pharmacistChoice == 5) running = false; // Logout
-                    break;
+                case "Info.Pharmacist" -> {
+                    // 确保 Pharmacist 对象已经被正确设置到 PharmacistMenu
+                    if (pharmacist != null) {
+                        PharmacistMenu.displayMenu();
+                        int pharmacistChoice = scanner.nextInt();
+                        scanner.nextLine(); // Consume newline
+                        PharmacistMenu.handleChoice(pharmacistChoice);
+                        if (pharmacistChoice == 5) running = false; // Logout
+                    } else {
+                        System.out.println("Pharmacist user not initialized properly.");
+                        running = false;
+                    }
+                }
 
-                case "Info.Administrator":
+                case "Info.Administrator" -> {
                     AdministratorMenu.displayMenu();
                     int adminChoice = scanner.nextInt();
                     scanner.nextLine(); // Consume newline
                     AdministratorMenu.handleChoice(adminChoice);
                     if (adminChoice == 5) running = false; // Logout
-                    break;
+                }
 
-                default:
+                default -> {
                     System.out.println("Invalid role. Returning to login.");
                     running = false;
-                    break;
+                }
             }
         }
     }

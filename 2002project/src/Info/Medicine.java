@@ -9,7 +9,7 @@ public class Medicine {
     private int stock;
     private int lowStockAlertLevel;
 
-    private static final String MEDICINE_FILE_PATH = "Medicine.csv"; // The CSV file path
+    private static final String MEDICINE_FILE_PATH = "2002project/Medicine_List.csv"; // Update with the correct CSV file path
 
     // Constructor
     public Medicine(String name, int stock, int lowStockAlertLevel) {
@@ -59,6 +59,7 @@ public class Medicine {
                 int lowStockAlertLevel = Integer.parseInt(data[2].trim());
                 medicines.add(new Medicine(name, stock, lowStockAlertLevel));
             }
+            System.out.println("Medicine data loaded successfully.");
         } catch (IOException e) {
             System.err.println("Error reading medicine inventory CSV: " + e.getMessage());
         }
@@ -76,6 +77,7 @@ public class Medicine {
                 bw.write(medicine.toCSV());
                 bw.newLine();
             }
+            System.out.println("Medicine data saved successfully.");
         } catch (IOException e) {
             System.err.println("Error writing medicine inventory CSV: " + e.getMessage());
         }
@@ -107,5 +109,3 @@ public class Medicine {
                 '}';
     }
 }
-
-
