@@ -4,6 +4,7 @@ public class Medicine {
     private String name;
     private int stockLevel;
     private int lowStockAlert;
+    private boolean l;
 
     // constructor
     public Medicine(String name, int stockLevel, int lowStockAlert) {
@@ -34,5 +35,5 @@ public class Medicine {
         return lowStockAlert;
     }
 
-    
+
 }
