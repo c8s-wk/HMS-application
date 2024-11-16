@@ -8,7 +8,7 @@ public class Patient extends User{
     private MedicalRecord medicalRecord;
     private List<Appointment> appointments;
 
-    private static final String FILE_PATH = "patient_list.csv"; // Path to the CSV file
+    private static final String FILE_PATH = "Patient_List.csv"; // Path to the CSV file
 
     // Constructor
     public Patient(String patientID, String password, String role, MedicalRecord medicalRecord) {

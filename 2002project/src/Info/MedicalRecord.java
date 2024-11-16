@@ -11,8 +11,9 @@ public class MedicalRecord {
     private String bloodType;
     private String emailAddress; // Added email address
     private String contactNumber; // Added contact number
-    private List<String> pastDiagnoses; // Added past diagnoses
-    private List<String> pastTreatments; // Added past treatments
+    private List<String> pastDiagnoses; // List of past diagnoses
+    private List<String> pastTreatments; // List of past treatments
+    private List<String> prescriptions; // List of prescribed medications
     private String additionalNotes;
 
     // Constructor
@@ -26,11 +27,12 @@ public class MedicalRecord {
         this.contactNumber = contactNumber;
         this.pastDiagnoses = new ArrayList<>();
         this.pastTreatments = new ArrayList<>();
+        this.prescriptions = new ArrayList<>();
         this.additionalNotes = "";
     }
 
-    // Add past diagnosis and treatment during construction
-    public MedicalRecord(String patientID, String name, String dateOfBirth, String gender, String bloodType, String emailAddress, String contactNumber, String pastDiagnosis, String pastTreatment) {
+    // Add past diagnosis, treatment, and prescriptions during construction
+    public MedicalRecord(String patientID, String name, String dateOfBirth, String gender, String bloodType, String emailAddress, String contactNumber, String pastDiagnosis, String pastTreatment, String pastPrescriptions) {
         this(patientID, name, dateOfBirth, gender, bloodType, emailAddress, contactNumber);
         if (pastDiagnosis != null && !pastDiagnosis.isEmpty()) {
             for (String diagnosis : pastDiagnosis.split(";")) {
@@ -41,6 +43,41 @@ public class MedicalRecord {
             for (String treatment : pastTreatment.split(";")) {
                 this.pastTreatments.add(treatment.trim());
             }
+        }
+        if (pastPrescriptions != null && !pastPrescriptions.isEmpty()) {
+            for (String prescription : pastPrescriptions.split(";")) {
+                this.prescriptions.add(prescription.trim());
+            }
+        }
+    }
+
+    // Add new diagnosis
+    public void addDiagnosis(String diagnosis) {
+        if (diagnosis != null && !diagnosis.isEmpty()) {
+            this.pastDiagnoses.add(diagnosis.trim());
+            System.out.println("Diagnosis added: " + diagnosis);
+        } else {
+            System.out.println("Invalid diagnosis input.");
+        }
+    }
+
+    // Add new treatment plan
+    public void addTreatment(String treatment) {
+        if (treatment != null && !treatment.isEmpty()) {
+            this.pastTreatments.add(treatment.trim());
+            System.out.println("Treatment plan added: " + treatment);
+        } else {
+            System.out.println("Invalid treatment input.");
+        }
+    }
+
+    // Add new prescription
+    public void addPrescription(String prescription) {
+        if (prescription != null && !prescription.isEmpty()) {
+            this.prescriptions.add(prescription.trim());
+            System.out.println("Prescription added: " + prescription);
+        } else {
+            System.out.println("Invalid prescription input.");
         }
     }
 
@@ -101,16 +138,12 @@ public class MedicalRecord {
         return pastDiagnoses;
     }
 
-    public void addDiagnosis(String diagnosis) {
-        this.pastDiagnoses.add(diagnosis);
-    }
-
     public List<String> getPastTreatments() {
         return pastTreatments;
     }
 
-    public void addTreatment(String treatment) {
-        this.pastTreatments.add(treatment);
+    public List<String> getPrescriptions() {
+        return prescriptions;
     }
 
     public String getAdditionalNotes() {
@@ -133,6 +166,7 @@ public class MedicalRecord {
                 ", contactNumber='" + contactNumber + '\'' +
                 ", pastDiagnoses=" + pastDiagnoses +
                 ", pastTreatments=" + pastTreatments +
+                ", prescriptions=" + prescriptions +
                 ", additionalNotes='" + additionalNotes + '\'' +
                 '}';
     }

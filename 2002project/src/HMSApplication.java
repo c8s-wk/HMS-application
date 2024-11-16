@@ -2,72 +2,156 @@ import UserMenu.AdministratorMenu;
 import UserMenu.DoctorMenu;
 import UserMenu.PatientMenu;
 import UserMenu.PharmacistMenu;
+import Info.Patient;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 
 public class HMSApplication {
-    private static Map<String, String> userCredentials = new HashMap<>();
-    private static Map<String, String> userRoles = new HashMap<>();
+    private static List<Patient> patients = new ArrayList<>();
+    private static Map<String, Map<String, String>> staffData = new HashMap<>(); // Staff data as a map
 
     public static void main(String[] args) {
-        initializeUsers();
+        initializeUsers(); // Initialize patients and staff from CSV files
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Welcome to the Hospital Management System!");
-        String hospitalID;
-        String password;
         boolean isAuthenticated = false;
+        String userID = "";
+        String password;
 
-        // Info.User authentication loop
+        // User authentication loop
         while (!isAuthenticated) {
-            System.out.print("Enter your Hospital ID: ");
-            hospitalID = scanner.nextLine();
+            System.out.print("Enter your User ID: ");
+            userID = scanner.nextLine();
             System.out.print("Enter your password: ");
             password = scanner.nextLine();
 
-            isAuthenticated = authenticateUser(hospitalID, password);
+            if (!"password".equals(password)) {
+                System.out.println("Invalid password. Please try again.");
+                continue;
+            }
+
+            isAuthenticated = authenticateUser(userID);
 
             if (!isAuthenticated) {
                 System.out.println("Invalid credentials. Please try again.");
             } else {
                 System.out.println("Login successful!");
-                String userRole = userRoles.get(hospitalID);
-                displayUserMenu(userRole);
+                String userRole = getUserRole(userID);
+                displayUserMenu(userRole, userID);
             }
         }
         scanner.close();
     }
 
-    // Initialize users with their credentials and roles
-    // should read date from excel???
-
-
+    // Initialize patients and staff from CSV files
     private static void initializeUsers() {
-        // Sample data
-        userCredentials.put("P1001", "password");
-        userRoles.put("P1001", "Info.Patient");
-
-        userCredentials.put("D2001", "password");
-        userRoles.put("D2001", "Info.Doctor");
-
-        userCredentials.put("PH3001", "password");
-        userRoles.put("PH3001", "Info.Pharmacist");
-
-        userCredentials.put("A4001", "password");
-        userRoles.put("A4001", "Info.Administrator");
-
-        // Additional users can be added here
+        initializePatientsFromCSV("patients.csv");
+        initializeStaffFromCSV("staff_list.csv");
     }
 
-    // Authenticate the user based on Hospital ID and password
-    private static boolean authenticateUser(String hospitalID, String password) {
-        return userCredentials.containsKey(hospitalID) && userCredentials.get(hospitalID).equals(password);
+    // Initialize patients from CSV file
+    private static void initializePatientsFromCSV(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+
+            // Skip the header
+            br.readLine();
+
+            // Read each line
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length < 7) {
+                    System.err.println("Invalid row in CSV: " + line);
+                    continue;
+                }
+
+                String patientID = data[0].trim();
+                String name = data[1].trim();
+                String dateOfBirth = data[2].trim();
+                String gender = data[3].trim();
+                String bloodType = data[4].trim();
+                String email = data[5].trim();
+                String contactNumber = data[6].trim();
+
+                patients.add(new Patient(patientID, "password", "Patient", name, dateOfBirth, gender, bloodType, email, contactNumber));
+            }
+            System.out.println("Patient data loaded successfully.");
+        } catch (IOException e) {
+            System.err.println("Error reading the CSV file: " + e.getMessage());
+        }
+    }
+
+    // Initialize staff from CSV file
+    private static void initializeStaffFromCSV(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+
+            // Skip the header
+            br.readLine();
+
+            // Read each line
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length < 5) {
+                    System.err.println("Invalid row in CSV: " + line);
+                    continue;
+                }
+
+                Map<String, String> staff = new HashMap<>();
+                staff.put("ID", data[0].trim());
+                staff.put("Name", data[1].trim());
+                staff.put("Role", data[2].trim());
+                staff.put("Gender", data[3].trim());
+                staff.put("Age", data[4].trim());
+
+                staffData.put(data[0].trim(), staff);
+            }
+            System.out.println("Staff data loaded successfully.");
+        } catch (IOException e) {
+            System.err.println("Error reading the CSV file: " + e.getMessage());
+        }
+    }
+
+    // Authenticate the user based on User ID
+    private static boolean authenticateUser(String userID) {
+        for (Patient patient : patients) {
+            if (patient.getUserID().equals(userID)) {
+                return true;
+            }
+        }
+
+        return staffData.containsKey(userID);
+    }
+
+    // Get the user role based on User ID
+    private static String getUserRole(String userID) {
+        for (Patient patient : patients) {
+            if (patient.getUserID().equals(userID)) {
+                return "Info.Patient";
+            }
+        }
+
+        if (staffData.containsKey(userID)) {
+            String role = staffData.get(userID).get("Role");
+            switch (role) {
+                case "Doctor":
+                    return "Info.Doctor";
+                case "Pharmacist":
+                    return "Info.Pharmacist";
+                case "Administrator":
+                    return "Info.Administrator";
+            }
+        }
+
+        return "Unknown";
     }
 
     // Display the menu based on the user's role
-    private static void displayUserMenu(String userRole) {
+    private static void displayUserMenu(String userRole, String userID) {
         boolean running = true;
         Scanner scanner = new Scanner(System.in);
 

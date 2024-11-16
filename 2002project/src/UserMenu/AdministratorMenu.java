@@ -13,7 +13,7 @@ public class AdministratorMenu {
     //private static final List<String> appointments = new ArrayList<>();
     //private static final List<String> medicationInventory = new ArrayList<>();
     //private static final List<String> replenishmentRequests = new ArrayList<>();
-    private static final String STAFF_FILE = "Staff_List.csv";
+    private static final String STAFF_FILE = "Staff_List.xlsx";
     private static final String APPOINTMENTS_FILE = "Appointments.csv";
     private static final String INVENTORY_FILE = "Medicine_List.csv";
     private final Administrator admin;

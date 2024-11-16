@@ -33,6 +33,7 @@ public class PatientDataReader {
                 String contactNumber = data[6];
                 String pastDiagnosis = data[7];
                 String pastTreatment = data[8];
+                String prescriptions = data[9];
 
                 // Create MedicalRecord
                 MedicalRecord medicalRecord = new MedicalRecord(
@@ -44,7 +45,8 @@ public class PatientDataReader {
                         emailAddress,
                         contactNumber,
                         pastDiagnosis,
-                        pastTreatment
+                        pastTreatment,
+                        prescriptions
                 );
 
                 // Default values for password and role
