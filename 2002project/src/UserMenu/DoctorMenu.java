@@ -39,7 +39,6 @@ public class DoctorMenu {
             case 1 -> viewPatientMedicalRecords();
             case 2 -> updatePatientMedicalRecords(scanner);
             case 3 -> currentDoctor.viewSchedule();
-            case 4 -> setAvailability(scanner);
             case 5 -> acceptOrDeclineAppointments(scanner);
             case 6 -> viewUpcomingAppointments();
             case 7 -> recordAppointmentOutcome(scanner);

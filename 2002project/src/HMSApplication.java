@@ -3,6 +3,7 @@ import UserMenu.DoctorMenu;
 import UserMenu.PatientMenu;
 import UserMenu.PharmacistMenu;
 import Info.Patient;
+import Info.MedicalRecord;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,61 +12,58 @@ import java.util.*;
 
 public class HMSApplication {
     private static List<Patient> patients = new ArrayList<>();
-    private static Map<String, Map<String, String>> staffData = new HashMap<>(); // Staff data as a map
-///
+    private static Map<String, Map<String, String>> staffData = new HashMap<>(); // Staff data map (ID -> Details)
+
     public static void main(String[] args) {
         initializeUsers(); // Initialize patients and staff from CSV files
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Welcome to the Hospital Management System!");
-        boolean isAuthenticated = false;
-        String userID = "";
-        String password;
 
         // User authentication loop
-        while (!isAuthenticated) {
+        while (true) {
             System.out.print("Enter your User ID: ");
-            userID = scanner.nextLine();
+            String userID = scanner.nextLine();
             System.out.print("Enter your password: ");
-            password = scanner.nextLine();
+            String password = scanner.nextLine();
 
+            // Password validation
             if (!"password".equals(password)) {
                 System.out.println("Invalid password. Please try again.");
                 continue;
             }
 
-            isAuthenticated = authenticateUser(userID);
-
-            if (!isAuthenticated) {
-                System.out.println("Invalid credentials. Please try again.");
-            } else {
+            // User authentication
+            if (authenticateUser(userID)) {
                 System.out.println("Login successful!");
                 String userRole = getUserRole(userID);
-                displayUserMenu(userRole, userID);
+                if ("Unknown".equals(userRole)) {
+                    System.out.println("Invalid user role. Access denied.");
+                } else {
+                    displayUserMenu(userRole, userID);
+                }
+            } else {
+                System.out.println("Invalid credentials. Please try again.");
             }
         }
-        scanner.close();
     }
 
     // Initialize patients and staff from CSV files
     private static void initializeUsers() {
-        initializePatientsFromCSV("patients.csv");
-        initializeStaffFromCSV("staff_list.csv");
+        initializePatientsFromCSV("2002project/Patient_List.csv");
+        initializeStaffFromCSV("2002project/Staff_List.csv");
     }
 
     // Initialize patients from CSV file
     private static void initializePatientsFromCSV(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
+            br.readLine(); // Skip header
 
-            // Skip the header
-            br.readLine();
-
-            // Read each line
             while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
+                String[] data = line.split(",", -1); // Handle empty fields gracefully
                 if (data.length < 7) {
-                    System.err.println("Invalid row in CSV: " + line);
+                    System.err.println("Invalid row in Patient CSV: " + line);
                     continue;
                 }
 
@@ -76,12 +74,16 @@ public class HMSApplication {
                 String bloodType = data[4].trim();
                 String email = data[5].trim();
                 String contactNumber = data[6].trim();
+                String pastDiagnoses = data[7].trim();
+                String pastTreatments = data[8].trim();
+                String additionalNotes = data[9].trim();
 
-                patients.add(new Patient(patientID, "password", "Patient", name, dateOfBirth, gender, bloodType, email, contactNumber));
+                MedicalRecord medicalRecord = new MedicalRecord(patientID, name, dateOfBirth, gender, bloodType, email, contactNumber, pastDiagnoses, pastTreatments, additionalNotes);
+                patients.add(new Patient(patientID, "password", "Patient", medicalRecord));
             }
             System.out.println("Patient data loaded successfully.");
         } catch (IOException e) {
-            System.err.println("Error reading the CSV file: " + e.getMessage());
+            System.err.println("Error reading the Patient CSV file: " + e.getMessage());
         }
     }
 
@@ -89,15 +91,12 @@ public class HMSApplication {
     private static void initializeStaffFromCSV(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
+            br.readLine(); // Skip header
 
-            // Skip the header
-            br.readLine();
-
-            // Read each line
             while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
+                String[] data = line.split(",", -1); // Handle empty fields gracefully
                 if (data.length < 5) {
-                    System.err.println("Invalid row in CSV: " + line);
+                    System.err.println("Invalid row in Staff CSV: " + line);
                     continue;
                 }
 
@@ -112,39 +111,41 @@ public class HMSApplication {
             }
             System.out.println("Staff data loaded successfully.");
         } catch (IOException e) {
-            System.err.println("Error reading the CSV file: " + e.getMessage());
+            System.err.println("Error reading the Staff CSV file: " + e.getMessage());
         }
     }
 
     // Authenticate the user based on User ID
     private static boolean authenticateUser(String userID) {
+        // Check if the user is a patient
         for (Patient patient : patients) {
             if (patient.getUserID().equals(userID)) {
                 return true;
             }
         }
 
+        // Check if the user is staff
         return staffData.containsKey(userID);
     }
 
     // Get the user role based on User ID
     private static String getUserRole(String userID) {
+        // Check for patient role
         for (Patient patient : patients) {
             if (patient.getUserID().equals(userID)) {
                 return "Info.Patient";
             }
         }
 
+        // Check for staff role
         if (staffData.containsKey(userID)) {
             String role = staffData.get(userID).get("Role");
-            switch (role) {
-                case "Doctor":
-                    return "Info.Doctor";
-                case "Pharmacist":
-                    return "Info.Pharmacist";
-                case "Administrator":
-                    return "Info.Administrator";
-            }
+            return switch (role) {
+                case "Doctor" -> "Info.Doctor";
+                case "Pharmacist" -> "Info.Pharmacist";
+                case "Administrator" -> "Info.Administrator";
+                default -> "Unknown";
+            };
         }
 
         return "Unknown";
@@ -160,37 +161,40 @@ public class HMSApplication {
                 case "Info.Patient":
                     PatientMenu.displayMenu();
                     int patientChoice = scanner.nextInt();
-                    scanner.nextLine(); // Consume the newline character
+                    scanner.nextLine(); // Consume newline
                     PatientMenu.handleChoice(patientChoice);
-                    if (patientChoice == 9) running = false; // Logout option
+                    if (patientChoice == 9) running = false; // Logout
                     break;
+
                 case "Info.Doctor":
                     DoctorMenu.displayMenu();
                     int doctorChoice = scanner.nextInt();
-                    scanner.nextLine(); // Consume the newline character
+                    scanner.nextLine(); // Consume newline
                     DoctorMenu.handleChoice(doctorChoice);
-                    if (doctorChoice == 8) running = false; // Logout option
+                    if (doctorChoice == 8) running = false; // Logout
                     break;
+
                 case "Info.Pharmacist":
                     PharmacistMenu.displayMenu();
                     int pharmacistChoice = scanner.nextInt();
-                    scanner.nextLine(); // Consume the newline character
+                    scanner.nextLine(); // Consume newline
                     PharmacistMenu.handleChoice(pharmacistChoice);
-                    if (pharmacistChoice == 5) running = false; // Logout option
+                    if (pharmacistChoice == 5) running = false; // Logout
                     break;
+
                 case "Info.Administrator":
                     AdministratorMenu.displayMenu();
                     int adminChoice = scanner.nextInt();
-                    scanner.nextLine(); // Consume the newline character
+                    scanner.nextLine(); // Consume newline
                     AdministratorMenu.handleChoice(adminChoice);
-                    if (adminChoice == 5) running = false; // Logout option
+                    if (adminChoice == 5) running = false; // Logout
                     break;
+
                 default:
-                    System.out.println("Invalid role.");
+                    System.out.println("Invalid role. Returning to login.");
                     running = false;
                     break;
             }
         }
-        scanner.close();
     }
 }

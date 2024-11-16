@@ -33,7 +33,7 @@ public class AdministratorMenu {
         System.out.print("Please enter your choice: ");
     }
 
-    public static void handleChoice() {
+    public static void handleChoice(int adminChoice) {
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
 
