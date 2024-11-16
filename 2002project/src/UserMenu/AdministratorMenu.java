@@ -15,7 +15,7 @@ public class AdministratorMenu {
     //private static final List<String> replenishmentRequests = new ArrayList<>();
     private static final String STAFF_FILE = "Staff_List.csv";
     private static final String APPOINTMENTS_FILE = "Appointments.csv";
-    private static final String MEDICINE_FILE = "Medicine_List.csv";
+    private static final String INVENTORY_FILE_FILE = "Medicine_List.csv";
     private final Administrator admin;
     private static final Scanner scanner = new Scanner(System.in);
 
@@ -38,7 +38,7 @@ public class AdministratorMenu {
                 viewAppointmentDetails();
                 break;
             case 3:
-                manageMedicationInventory();
+                manageMedicalInventory();
                 break;
             case 4:
                 approveReplenishmentRequests();
@@ -51,7 +51,7 @@ public class AdministratorMenu {
         }
     }
 
-    private static void manageHospitalStaff() {
+    private void manageHospitalStaff() {
         System.out.println("\nManaging hospital staff...");
         System.out.println("1. View Staff");
         System.out.println("2. Add Staff");
@@ -72,7 +72,7 @@ public class AdministratorMenu {
                 updateStaff();
                 break;
             case 4:
-                deleteStaff();
+                removeStaff();
                 break;
             default:
                 System.out.println("Invalid choice.");
@@ -142,7 +142,7 @@ public class AdministratorMenu {
                 updateInventory();
                 break;
             case 4:
-                deleteInventory();
+                removeInventory();
                 break;
             default:
                 System.out.println("Invalid choice.");
