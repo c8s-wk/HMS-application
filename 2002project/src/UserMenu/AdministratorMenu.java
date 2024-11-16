@@ -15,9 +15,13 @@ public class AdministratorMenu {
     //private static final List<String> replenishmentRequests = new ArrayList<>();
     private static final String STAFF_FILE = "Staff_List.csv";
     private static final String APPOINTMENTS_FILE = "Appointments.csv";
-    private static final String INVENTORY_FILE_FILE = "Medicine_List.csv";
+    private static final String INVENTORY_FILE = "Medicine_List.csv";
     private final Administrator admin;
     private static final Scanner scanner = new Scanner(System.in);
+
+    public AdministratorMenu(Administrator admin) {
+        this.admin = admin;
+    }
 
     public static void displayMenu() {
         System.out.println("\nAdministrator Menu:");
@@ -29,7 +33,7 @@ public class AdministratorMenu {
         System.out.print("Enter your choice: ");
     }
 
-    public static void handleChoice(int choice) {
+    public void handleChoice(int choice) {
         switch (choice) {
             case 1:
                 manageHospitalStaff();
@@ -121,7 +125,7 @@ public class AdministratorMenu {
         viewRecords(appointmentRecords, "Appointments");
     }*/
 
-    private static void manageMedicalInventory() {
+    private void manageMedicalInventory() {
         System.out.println("\nManaging medical inventory...");
         System.out.println("1. View Inventory");
         System.out.println("2. Add Medication");
@@ -296,7 +300,7 @@ public class AdministratorMenu {
         }
     }*/
 
-    private static void approveReplenishmentRequests() {
+    /*private static void approveReplenishmentRequests() {
         System.out.println("Approving replenishment requests...");
         if (replenishmentRequests.isEmpty()) {
             System.out.println("No replenishment requests pending.");
@@ -308,7 +312,7 @@ public class AdministratorMenu {
             }
         }
     }
-}
+}*/
 /*public class AdministratorMenu {
 
     public static void displayMenu() {

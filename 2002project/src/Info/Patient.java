@@ -149,8 +149,13 @@ public class Patient extends User implements PersonalInfo {
 
     // Get doctor by ID (Assuming there's a way to fetch doctors)
     private Doctor getDoctorById(String doctorId) {
-        // Implement logic to fetch doctor object by doctorId
-        return null; // Replace with actual implementation
+        for (Doctor doctor : doctors) {
+            if (doctor.getDoctorId().equals(doctorId)) {
+                return doctor; // Return the Doctor object if IDs match
+            }
+        }
+        System.out.println("Doctor with ID " + doctorId + " not found.");
+        return null;
     }
 
     @Override
