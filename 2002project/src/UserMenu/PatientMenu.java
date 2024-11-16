@@ -94,9 +94,12 @@ public class PatientMenu {
     }
 
     private static void viewAvailableAppointments() {
-        // Assuming we have a list of doctors
-        List<Doctor> doctors = Doctor.getAllDoctors(); // Placeholder for doctor repository
-        currentPatient.viewAvailableAppointmentSlots(doctors);
+        if (currentPatient != null) {
+            List<Doctor> doctors = Doctor.getAllDoctors(); // Retrieve list of all doctors
+            currentPatient.viewAvailableAppointmentSlots(doctors);
+        } else {
+            System.out.println("No patient is currently logged in.");
+        }
     }
 
     private static void scheduleAppointment() {
@@ -110,9 +113,17 @@ public class PatientMenu {
             System.out.print("Enter appointment time (HH:MM): ");
             String time = scanner.nextLine();
 
-            Doctor doctor = Doctor.getDoctorById(doctorId); // Placeholder for doctor repository
+            Doctor doctor = Doctor.getDoctorById(doctorId); // Retrieve doctor by ID
             if (doctor != null) {
-                boolean success = currentPatient.scheduleAppointment(doctor, date, time);
+                Appointment newAppointment = new Appointment(
+                        generateAppointmentID(),
+                        currentPatient.getUserID(),
+                        doctorId,
+                        date,
+                        time,
+                        "Pending"
+                );
+                boolean success = Appointment.scheduleAppointment(newAppointment);
                 if (success) {
                     System.out.println("Appointment scheduled successfully.");
                 }
@@ -138,6 +149,8 @@ public class PatientMenu {
             boolean success = currentPatient.rescheduleAppointment(appointmentId, newDate, newTime);
             if (success) {
                 System.out.println("Appointment rescheduled successfully.");
+            } else {
+                System.out.println("Failed to reschedule appointment.");
             }
         } else {
             System.out.println("No patient is currently logged in.");
@@ -154,6 +167,8 @@ public class PatientMenu {
             boolean success = currentPatient.cancelAppointment(appointmentId);
             if (success) {
                 System.out.println("Appointment canceled successfully.");
+            } else {
+                System.out.println("Failed to cancel appointment.");
             }
         } else {
             System.out.println("No patient is currently logged in.");
@@ -163,8 +178,13 @@ public class PatientMenu {
     private static void viewScheduledAppointments() {
         if (currentPatient != null) {
             System.out.println("\n--- Scheduled Appointments ---");
-            for (Appointment appointment : currentPatient.getAppointments()) {
-                System.out.println(appointment);
+            List<Appointment> appointments = currentPatient.getAppointments();
+            if (appointments.isEmpty()) {
+                System.out.println("No scheduled appointments.");
+            } else {
+                for (Appointment appointment : appointments) {
+                    System.out.println(appointment);
+                }
             }
         } else {
             System.out.println("No patient is currently logged in.");
@@ -174,9 +194,18 @@ public class PatientMenu {
     private static void viewPastAppointmentRecords() {
         if (currentPatient != null) {
             System.out.println("\n--- Past Appointment Outcome Records ---");
-            // Placeholder: Implement logic to view past outcomes
+            List<Appointment> appointments = currentPatient.getAppointments();
+            for (Appointment appointment : appointments) {
+                if ("Completed".equals(appointment.getStatus())) {
+                    System.out.println(appointment);
+                }
+            }
         } else {
             System.out.println("No patient is currently logged in.");
         }
+    }
+
+    private static String generateAppointmentID() {
+        return "A" + System.currentTimeMillis(); // Generate a unique ID based on timestamp
     }
 }
