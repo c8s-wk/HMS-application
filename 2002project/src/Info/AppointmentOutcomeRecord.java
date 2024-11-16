@@ -67,7 +67,7 @@ public class AppointmentOutcomeRecord {
         System.out.println("Dispensing all prescriptions for Appointment ID: " + appointmentID + "...");
         for (Prescription prescription : prescribedMedications) {
             if (!prescription.getStatus().equalsIgnoreCase("dispensed")) {
-                prescription.dispense();
+                Inventory.dispense.Medicine();
                 System.out.println("Dispensed: " + prescription.getMedicineName());
             } else {
                 System.out.println("Already dispensed: " + prescription.getMedicineName());

@@ -8,7 +8,7 @@ public class Inventory {
     private String medicineName;
     private int stockLevel;
     private int lowStockAlertLevel;
-    private static final String medicineFilePath = "Medicine_List.csv";  // Path to the CSV file
+    private static final String medicineFilePath = "2002project/Medicine_List.csv";  // Path to the CSV file
 
     // Constructor
     public Inventory(String medicineName, int stockLevel, int lowStockAlertLevel) {
