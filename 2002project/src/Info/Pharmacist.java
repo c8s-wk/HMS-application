@@ -10,21 +10,21 @@ public class Pharmacist extends User {
 
     // View Appointment Outcome Records (Prescriptions)
     public void viewAppointmentOutcomeRecords() {
-        List<Prescription> prescriptions = Prescription.loadPrescriptionsFromCSV();
+        List<AppointmentOutcomeRecord> records = AppointmentOutcomeRecord.loadAppointmentOutcomesFromCSV();
         System.out.println("--- Appointment Outcome Records ---");
-        for (Prescription prescription : prescriptions) {
-            System.out.println(prescription);
+        for (AppointmentOutcomeRecord record : records) {
+            record.viewOutcomeDetails();
         }
     }
 
     // Update Prescription Status
-    public boolean updatePrescriptionStatus(String prescriptionID, String newStatus) {
+    public boolean updatePrescriptionStatus(String prescriptionID) {
         List<Prescription> prescriptions = Prescription.loadPrescriptionsFromCSV();
         for (Prescription prescription : prescriptions) {
             if (prescription.getPrescriptionID().equals(prescriptionID)) {
-                prescription.setStatus(newStatus);
+                prescription.setStatus("dispensed");
                 Prescription.savePrescriptionsToCSV(prescriptions);
-                System.out.println("Prescription status updated to: " + newStatus);
+                System.out.println("Prescription status updated to: " + prescription.getStatus());
                 return true;
             }
         }
@@ -37,9 +37,11 @@ public class Pharmacist extends User {
         List<Medicine> medicines = Medicine.loadMedicinesFromCSV();
         System.out.println("--- Medication Inventory ---");
         for (Medicine medicine : medicines) {
-            System.out.println(medicine);
+            System.out.println("Name: " + medicine.getName() + ", Stock: " + medicine.getStock());
         }
+        System.out.println("----------------------------------");
     }
+
 
     // Submit Replenishment Request
     public void submitReplenishmentRequest(String medicineName, int additionalStock) {
@@ -56,5 +58,7 @@ public class Pharmacist extends User {
         }
         System.out.println("Medicine not found in inventory: " + medicineName);
     }
+
+
 }
 
