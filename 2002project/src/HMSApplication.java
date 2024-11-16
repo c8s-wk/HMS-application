@@ -12,7 +12,7 @@ import java.util.*;
 public class HMSApplication {
     private static List<Patient> patients = new ArrayList<>();
     private static Map<String, Map<String, String>> staffData = new HashMap<>(); // Staff data as a map
-
+///
     public static void main(String[] args) {
         initializeUsers(); // Initialize patients and staff from CSV files
         Scanner scanner = new Scanner(System.in);
