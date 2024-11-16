@@ -12,7 +12,9 @@ public class Doctor extends User {
     private int age;
     private List<Appointment> appointments; // List of appointments
     private Map<String, Boolean> availableSlots; // Map of available slots (date-time as key, availability as value)
-    private static final String APPOINTMENT_FILE = "appointments.csv"; // CSV file path
+    private static final String STAFF_FILE = "2002project/Staff_List.csv";
+    private static final String APPOINTMENT_FILE = "2002project/Appointment.csv"; // CSV file path
+    private static List<Doctor> allDoctors = new ArrayList<>(); // Cached list of all doctors
 
     // Constructor
     public Doctor(String userID, String password, String name, String gender, int age) {
@@ -23,6 +25,52 @@ public class Doctor extends User {
         this.appointments = new ArrayList<>();
         this.availableSlots = new HashMap<>();
         loadAppointmentsFromCSV();
+    }
+
+    // Static method to retrieve all doctors
+    public static List<Doctor> getAllDoctors() {
+        if (!allDoctors.isEmpty()) {
+            return allDoctors; // Return cached list if already loaded
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(STAFF_FILE))) {
+            String line;
+
+            // Skip the header
+            br.readLine();
+
+            // Read each line
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length < 5) {
+                    continue; // Skip invalid rows
+                }
+
+                String staffID = data[0].trim();
+                String name = data[1].trim();
+                String role = data[2].trim();
+                String gender = data[3].trim();
+                int age = Integer.parseInt(data[4].trim());
+
+                if ("Doctor".equalsIgnoreCase(role)) {
+                    allDoctors.add(new Doctor(staffID, "password", name, gender, age));
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading doctor data: " + e.getMessage());
+        }
+        return allDoctors;
+    }
+
+    // Static method to get a doctor by ID
+    public static Doctor getDoctorById(String doctorId) {
+        for (Doctor doctor : getAllDoctors()) {
+            if (doctor.getUserID().equals(doctorId)) {
+                return doctor; // Return the Doctor object if IDs match
+            }
+        }
+        System.out.println("Doctor with ID " + doctorId + " not found.");
+        return null;
     }
 
     // Getters
@@ -41,17 +89,6 @@ public class Doctor extends User {
     public List<Appointment> getAppointments() {
         return appointments;
     }
-
-    public static Doctor getDoctorById(String doctorId) {
-        for (Doctor doctor : doctors) {
-            if (doctor.getUserID().equals(doctorId)) {
-                return doctor; // Return the Doctor object if the IDs match
-            }
-        }
-        System.out.println("Doctor with ID " + doctorId + " not found.");
-        return null; // Return null if no matching doctor is found
-    }
-
 
     // Set availability for appointments
     public void setAvailability(String date, String time) {
