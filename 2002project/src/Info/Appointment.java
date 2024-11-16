@@ -1,32 +1,27 @@
 package Info;
 
 import java.io.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Appointment {
     private String appointmentID;
     private String patientID;
     private String doctorID;
-    private String date; // Format: YYYY-MM-DD
-    private String time; // Format: HH:MM
-    private String status; // Scheduled, Rescheduled, Cancelled, or Completed
-    private static final String FILE_PATH = "appointments.csv"; // Path to the CSV file
-    private static Map<String, Map<String, String>> doctorSchedule = new HashMap<>(); // Doctor schedule by date and time
+    private String date;
+    private String time;
+    private String status; // Pending, Accepted, Declined, Completed
+
+    private static final String FILE_PATH = "2002project/Appointment.csv"; // Path to the CSV file
 
     // Constructor
-    public Appointment(String appointmentID, String patientID, String doctorID, String date, String time) {
+    public Appointment(String appointmentID, String patientID, String doctorID, String date, String time, String status) {
         this.appointmentID = appointmentID;
         this.patientID = patientID;
         this.doctorID = doctorID;
         this.date = date;
         this.time = time;
-        this.status = "Scheduled"; // Default status
-        updateDoctorAvailability(doctorID, date, time, false); // Mark slot as unavailable
-        saveToCSV(); // Save new appointment to CSV
+        this.status = status;
     }
 
     // Getters and Setters
@@ -46,20 +41,18 @@ public class Appointment {
         return date;
     }
 
-    public void setDate(String newDate) {
-        this.date = newDate;
-        this.status = "Rescheduled";
-        updateCSV(); // Update CSV file
+    public void setDate(String date) {
+        this.date = date;
+        updateAppointmentInCSV();
     }
 
     public String getTime() {
         return time;
     }
 
-    public void setTime(String newTime) {
-        this.time = newTime;
-        this.status = "Rescheduled";
-        updateCSV(); // Update CSV file
+    public void setTime(String time) {
+        this.time = time;
+        updateAppointmentInCSV();
     }
 
     public String getStatus() {
@@ -68,161 +61,137 @@ public class Appointment {
 
     public void setStatus(String status) {
         this.status = status;
-        updateCSV(); // Update CSV file
+        updateAppointmentInCSV();
     }
 
-    // Check if the appointment is in the past
-    public boolean isPast() {
-        LocalDate appointmentDate = LocalDate.parse(date);
-        LocalTime appointmentTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
-        LocalDate today = LocalDate.now();
-        LocalTime now = LocalTime.now();
+    // Load all appointments from CSV
+    public static List<Appointment> loadAppointmentsFromCSV(String filePath) {
+        List<Appointment> appointments = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            // Skip header
+            br.readLine();
 
-        return appointmentDate.isBefore(today) ||
-                (appointmentDate.isEqual(today) && appointmentTime.isBefore(now));
-    }
-
-    // Save the appointment to the CSV file
-    private void saveToCSV() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
-            bw.write(String.join(",", appointmentID, doctorID, patientID, date, time, status));
-            bw.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Update the CSV file with the latest appointment data
-    private void updateCSV() {
-        File file = new File(FILE_PATH);
-        File tempFile = new File("temp_appointments.csv");
-        try (BufferedReader br = new BufferedReader(new FileReader(file));
-             BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
+            // Read each record
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                if (data[0].equals(appointmentID)) { // Match by appointment ID
-                    // Replace with updated details
-                    line = String.join(",", appointmentID, doctorID, patientID, date, time, status);
+                if (data.length < 6) {
+                    System.err.println("Invalid row in Appointment CSV: " + line);
+                    continue;
                 }
-                bw.write(line);
+
+                String appointmentID = data[0];
+                String patientID = data[1];
+                String doctorID = data[2];
+                String date = data[3];
+                String time = data[4];
+                String status = data[5];
+
+                appointments.add(new Appointment(appointmentID, patientID, doctorID, date, time, status));
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading Appointment CSV: " + e.getMessage());
+        }
+        return appointments;
+    }
+
+    // Save all appointments to CSV
+    public static void saveAppointmentsToCSV(String filePath, List<Appointment> appointments) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
+            // Write header
+            bw.write("AppointmentID,PatientID,DoctorID,Date,Time,Status");
+            bw.newLine();
+
+            // Write data
+            for (Appointment appointment : appointments) {
+                bw.write(appointment.toCSV());
                 bw.newLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error saving Appointment CSV: " + e.getMessage());
         }
+    }
 
-        // Replace old file with updated file
-        if (!file.delete()) {
-            System.err.println("Could not delete original file.");
+    // Update appointment in CSV
+    private void updateAppointmentInCSV() {
+        List<Appointment> appointments = loadAppointmentsFromCSV(FILE_PATH);
+        for (int i = 0; i < appointments.size(); i++) {
+            if (appointments.get(i).getAppointmentID().equals(this.appointmentID)) {
+                appointments.set(i, this); // Update the appointment
+                break;
+            }
         }
-        if (!tempFile.renameTo(file)) {
-            System.err.println("Could not rename temporary file.");
-        }
+        saveAppointmentsToCSV(FILE_PATH, appointments);
     }
 
     // Schedule a new appointment
-    public static Appointment scheduleAppointment(String appointmentID, String patientID, String doctorID, String date, String time) {
-        if (isSlotAvailable(doctorID, date, time)) {
-            return new Appointment(appointmentID, patientID, doctorID, date, time);
-        } else {
-            System.err.println("The selected time slot is not available for the doctor.");
-            return null;
+    public static boolean scheduleAppointment(Appointment appointment) {
+        List<Appointment> appointments = loadAppointmentsFromCSV(FILE_PATH);
+
+        // Check for slot availability
+        for (Appointment existing : appointments) {
+            if (existing.getDoctorID().equals(appointment.getDoctorID())
+                    && existing.getDate().equals(appointment.getDate())
+                    && existing.getTime().equals(appointment.getTime())
+                    && existing.getStatus().equals("Accepted")) {
+                System.out.println("The selected time slot is already booked.");
+                return false;
+            }
         }
+
+        appointments.add(appointment);
+        saveAppointmentsToCSV(FILE_PATH, appointments);
+        System.out.println("Appointment scheduled successfully.");
+        return true;
     }
 
     // Reschedule an existing appointment
-    public static boolean rescheduleAppointment(String appointmentID, String doctorID, String newDate, String newTime) {
-        if (!isSlotAvailable(doctorID, newDate, newTime)) {
-            System.err.println("The selected time slot is not available for the doctor.");
-            return false;
-        }
+    public static boolean rescheduleAppointment(String appointmentID, String newDate, String newTime) {
+        List<Appointment> appointments = loadAppointmentsFromCSV(FILE_PATH);
 
-        File file = new File(FILE_PATH);
-        File tempFile = new File("temp_appointments.csv");
-        boolean updated = false;
-
-        try (BufferedReader br = new BufferedReader(new FileReader(file));
-             BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data[0].equals(appointmentID)) { // Match by appointment ID
-                    updateDoctorAvailability(data[1], data[3], data[4], true); // Free the old slot
-                    data[3] = newDate;
-                    data[4] = newTime;
-                    data[5] = "Rescheduled";
-                    updateDoctorAvailability(doctorID, newDate, newTime, false); // Mark new slot as unavailable
-                    line = String.join(",", data);
-                    updated = true;
+        for (Appointment appointment : appointments) {
+            if (appointment.getAppointmentID().equals(appointmentID)) {
+                // Check for conflicts
+                for (Appointment existing : appointments) {
+                    if (existing.getDoctorID().equals(appointment.getDoctorID())
+                            && existing.getDate().equals(newDate)
+                            && existing.getTime().equals(newTime)
+                            && existing.getStatus().equals("Accepted")) {
+                        System.out.println("The new time slot is already booked.");
+                        return false;
+                    }
                 }
-                bw.write(line);
-                bw.newLine();
+                // Update the appointment
+                appointment.setDate(newDate);
+                appointment.setTime(newTime);
+                saveAppointmentsToCSV(FILE_PATH, appointments);
+                System.out.println("Appointment rescheduled successfully.");
+                return true;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        // Replace old file with updated file
-        if (!file.delete()) {
-            System.err.println("Could not delete original file.");
-        }
-        if (!tempFile.renameTo(file)) {
-            System.err.println("Could not rename temporary file.");
-        }
-
-        return updated;
+        System.out.println("Appointment not found.");
+        return false;
     }
 
     // Cancel an appointment
     public static boolean cancelAppointment(String appointmentID) {
-        File file = new File(FILE_PATH);
-        File tempFile = new File("temp_appointments.csv");
-        boolean canceled = false;
+        List<Appointment> appointments = loadAppointmentsFromCSV(FILE_PATH);
 
-        try (BufferedReader br = new BufferedReader(new FileReader(file));
-             BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data[0].equals(appointmentID)) { // Match by appointment ID
-                    updateDoctorAvailability(data[1], data[3], data[4], true); // Free the slot
-                    data[5] = "Cancelled";
-                    line = String.join(",", data);
-                    canceled = true;
-                }
-                bw.write(line);
-                bw.newLine();
+        for (int i = 0; i < appointments.size(); i++) {
+            if (appointments.get(i).getAppointmentID().equals(appointmentID)) {
+                appointments.get(i).setStatus("Cancelled");
+                saveAppointmentsToCSV(FILE_PATH, appointments);
+                System.out.println("Appointment cancelled successfully.");
+                return true;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        // Replace old file with updated file
-        if (!file.delete()) {
-            System.err.println("Could not delete original file.");
-        }
-        if (!tempFile.renameTo(file)) {
-            System.err.println("Could not rename temporary file.");
-        }
-
-        return canceled;
+        System.out.println("Appointment not found.");
+        return false;
     }
 
-    // Check if a slot is available
-    public static boolean isSlotAvailable(String doctorID, String date, String time) {
-        doctorSchedule.putIfAbsent(doctorID, new HashMap<>());
-        return !doctorSchedule.get(doctorID).containsKey(date + time);
-    }
-
-    // Update doctor availability
-    public static void updateDoctorAvailability(String doctorID, String date, String time, boolean available) {
-        doctorSchedule.putIfAbsent(doctorID, new HashMap<>());
-        if (available) {
-            doctorSchedule.get(doctorID).remove(date + time);
-        } else {
-            doctorSchedule.get(doctorID).put(date + time, "Unavailable");
-        }
+    // Convert appointment to CSV format
+    public String toCSV() {
+        return String.join(",", appointmentID, patientID, doctorID, date, time, status);
     }
 
     @Override

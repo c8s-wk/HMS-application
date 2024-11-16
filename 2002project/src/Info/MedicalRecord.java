@@ -1,5 +1,6 @@
 package Info;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,15 +10,17 @@ public class MedicalRecord {
     private String dateOfBirth;
     private String gender;
     private String bloodType;
-    private String emailAddress; // Added email address
-    private String contactNumber; // Added contact number
-    private List<String> pastDiagnoses; // List of past diagnoses
-    private List<String> pastTreatments; // List of past treatments
-    private List<String> prescriptions; // List of prescribed medications
+    private String emailAddress;
+    private String contactNumber;
+    private List<String> pastDiagnoses;
+    private List<String> pastTreatments;
+    private List<String> prescriptions;
     private String additionalNotes;
 
+    private static final String FILE_PATH = "2002project/Patient_List.csv"; // Path to the CSV file
+
     // Constructor
-    public MedicalRecord(String patientID, String name, String dateOfBirth, String gender, String bloodType, String emailAddress, String contactNumber) {
+    public MedicalRecord(String patientID, String name, String dateOfBirth, String gender, String bloodType, String emailAddress, String contactNumber,String pastDiagnoses, String presciption, String additionalNotes ) {
         this.patientID = patientID;
         this.name = name;
         this.dateOfBirth = dateOfBirth;
@@ -31,57 +34,62 @@ public class MedicalRecord {
         this.additionalNotes = "";
     }
 
-    // Add past diagnosis, treatment, and prescriptions during construction
-    public MedicalRecord(String patientID, String name, String dateOfBirth, String gender, String bloodType, String emailAddress, String contactNumber, String pastDiagnosis, String pastTreatment, String pastPrescriptions) {
-        this(patientID, name, dateOfBirth, gender, bloodType, emailAddress, contactNumber);
-        if (pastDiagnosis != null && !pastDiagnosis.isEmpty()) {
-            for (String diagnosis : pastDiagnosis.split(";")) {
+    // Fetch the medical record from the CSV file by patient ID
+    static MedicalRecord fetchMedicalRecordFromCSV(String patientID) {
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+
+            // Skip the header
+            br.readLine();
+
+            // Read each line
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",", -1); // Handle empty fields
+                if (data[0].equals(patientID)) { // Match by patient ID
+                    String name = data[1];
+                    String dateOfBirth = data[2];
+                    String gender = data[3];
+                    String bloodType = data[4];
+                    String email = data[5];
+                    String contactNumber = data[6];
+                    String pastDiagnosis = data.length > 7 ? data[7] : "";
+                    String pastTreatment = data.length > 8 ? data[8] : "";
+                    String prescriptions = data.length > 9 ? data[9] : "";
+                    String additionalNotes = data.length > 10 ? data[10] : "";
+
+                    return new MedicalRecord(patientID, name, dateOfBirth, gender, bloodType, email, contactNumber, pastDiagnosis, pastTreatment, prescriptions, additionalNotes);
+
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading medical record CSV: " + e.getMessage());
+        }
+
+        System.err.println("No medical record found for patient ID: " + patientID);
+        return null;
+    }
+
+    // Overloaded constructor with diagnosis, treatments, and prescriptions
+    public MedicalRecord(String patientID, String name, String dateOfBirth, String gender, String bloodType, String emailAddress, String contactNumber, String pastDiagnoses, String pastTreatments, String prescriptions, String additionalNotes) {
+        this(patientID, name, dateOfBirth, gender, bloodType, emailAddress, contactNumber, pastDiagnoses, prescriptions, additionalNotes);
+        if (pastDiagnoses != null && !pastDiagnoses.isEmpty()) {
+            for (String diagnosis : pastDiagnoses.split(";")) {
                 this.pastDiagnoses.add(diagnosis.trim());
             }
         }
-        if (pastTreatment != null && !pastTreatment.isEmpty()) {
-            for (String treatment : pastTreatment.split(";")) {
+        if (pastTreatments != null && !pastTreatments.isEmpty()) {
+            for (String treatment : pastTreatments.split(";")) {
                 this.pastTreatments.add(treatment.trim());
             }
         }
-        if (pastPrescriptions != null && !pastPrescriptions.isEmpty()) {
-            for (String prescription : pastPrescriptions.split(";")) {
+        if (prescriptions != null && !prescriptions.isEmpty()) {
+            for (String prescription : prescriptions.split(";")) {
                 this.prescriptions.add(prescription.trim());
             }
         }
     }
 
-    // Add new diagnosis
-    public void addDiagnosis(String diagnosis) {
-        if (diagnosis != null && !diagnosis.isEmpty()) {
-            this.pastDiagnoses.add(diagnosis.trim());
-            System.out.println("Diagnosis added: " + diagnosis);
-        } else {
-            System.out.println("Invalid diagnosis input.");
-        }
-    }
-
-    // Add new treatment plan
-    public void addTreatment(String treatment) {
-        if (treatment != null && !treatment.isEmpty()) {
-            this.pastTreatments.add(treatment.trim());
-            System.out.println("Treatment plan added: " + treatment);
-        } else {
-            System.out.println("Invalid treatment input.");
-        }
-    }
-
-    // Add new prescription
-    public void addPrescription(String prescription) {
-        if (prescription != null && !prescription.isEmpty()) {
-            this.prescriptions.add(prescription.trim());
-            System.out.println("Prescription added: " + prescription);
-        } else {
-            System.out.println("Invalid prescription input.");
-        }
-    }
-
-    // Getters and Setters
+    // Getters
     public String getPatientID() {
         return patientID;
     }
@@ -90,68 +98,85 @@ public class MedicalRecord {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getDateOfBirth() {
         return dateOfBirth;
-    }
-
-    public void setDateOfBirth(String dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
     }
 
     public String getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
     public String getBloodType() {
         return bloodType;
-    }
-
-    public void setBloodType(String bloodType) {
-        this.bloodType = bloodType;
     }
 
     public String getEmailAddress() {
         return emailAddress;
     }
 
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
-    }
-
     public String getContactNumber() {
         return contactNumber;
     }
 
+    // Setters with CSV update
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+        updateCSVFile();
+    }
+
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
+        updateCSVFile();
     }
 
-    public List<String> getPastDiagnoses() {
-        return pastDiagnoses;
+    // Add methods for diagnosis, treatments, and prescriptions
+    public void addDiagnosis(String diagnosis) {
+        if (diagnosis != null && !diagnosis.isEmpty()) {
+            this.pastDiagnoses.add(diagnosis.trim());
+            updateCSVFile();
+        }
     }
 
-    public List<String> getPastTreatments() {
-        return pastTreatments;
+    public void addTreatment(String treatment) {
+        if (treatment != null && !treatment.isEmpty()) {
+            this.pastTreatments.add(treatment.trim());
+            updateCSVFile();
+        }
     }
 
-    public List<String> getPrescriptions() {
-        return prescriptions;
+    public void addPrescription(String prescription) {
+        if (prescription != null && !prescription.isEmpty()) {
+            this.prescriptions.add(prescription.trim());
+            updateCSVFile();
+        }
     }
 
-    public String getAdditionalNotes() {
-        return additionalNotes;
-    }
+    // Update CSV file with the latest changes
+    void updateCSVFile() {
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data[0].equals(patientID)) { // Match patient ID
+                    line = String.join(",", patientID, name, dateOfBirth, gender, bloodType, emailAddress, contactNumber,
+                            String.join(";", pastDiagnoses), String.join(";", pastTreatments), String.join(";", prescriptions), additionalNotes);
+                }
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-    public void setAdditionalNotes(String additionalNotes) {
-        this.additionalNotes = additionalNotes;
+        // Write updated data back to the file
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
+            for (String line : lines) {
+                bw.write(line);
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
