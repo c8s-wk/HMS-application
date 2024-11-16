@@ -19,6 +19,28 @@ public class AppointmentOutcomeRecord {
         this.prescribedMedications = new ArrayList<>();
     }
 
+    // Setters
+    public void setAppointmentID(String appointmentID) {
+        this.appointmentID = appointmentID;
+    }
+
+    public void setDateOfAppointment(String dateOfAppointment) {
+        this.dateOfAppointment = dateOfAppointment;
+    }
+
+    public void setTypeOfService(String typeOfService) {
+        this.typeOfService = typeOfService;
+    }
+
+    public void setConsultationNotes(String consultationNotes) {
+        this.consultationNotes = consultationNotes;
+    }
+
+
+
+    public void addPrescription(String medicineName) {
+        prescribedMedications.add(new Prescription(medicineName));
+    }
     public void viewOutcomeDetails() {
         System.out.println("===== Appointment Outcome Details =====");
         System.out.println("Appointment ID: " + appointmentID);
