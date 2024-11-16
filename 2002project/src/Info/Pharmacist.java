@@ -1,28 +1,51 @@
 package Info;
 
-public class Pharmacist extends User {
-    // Additional attributes for Info.Pharmacist
+public class Pharmacist extends User{
     private String pharmacistID;
+   
 
-    // Constructor
-    public Pharmacist(String userID, String password, String pharmacistID) {
-        super(userID, password, "Info.Pharmacist");
+    
+    // constructor
+    public Pharmacist(String pharmacistID) {
         this.pharmacistID = pharmacistID;
+      
     }
-
-    // Getter
+    // get method and set method
     public String getPharmacistID() {
         return pharmacistID;
     }
-
-    // Display pharmacist information
-    public void displayPharmacistInfo() {
-        displayUserInfo(); // Calls the method from Info.User class
-        System.out.println("Info.Pharmacist ID: " + pharmacistID);
+    public void setPharmacistID(String pharmacistID) {
+        this.pharmacistID = pharmacistID;
     }
 
-    // Method to update prescription status
-    public void updatePrescriptionStatus(String prescriptionID, String status) {
-        System.out.println("Prescription " + prescriptionID + " updated to " + status);
+
+    public void viewAppointmentOutcome(AppointmentOutcomeRecord record) {
+        System.out.println("Viewing appointment outcome details:");
+        record.viewOutcomeDetails();
+    }
+
+    public void updatePrescriptionStatus(AppointmentOutcomeRecord record, String medicationName, String newStatus) {
+        for (Prescription prescription : record.getPrescribedMedications()) {
+            if (prescription.getMedicationName().equals(medicationName)) {
+                prescription.updateStatus(newStatus);
+                System.out.println("Prescription for " + medicationName + " updated to: " + newStatus);
+            }
+        }
+    }
+    public void viewInventory(){
+        Inventory.viewInventory();
+    }
+
+    public void checkLowStock() {
+        Inventory.checkLowStock();
+    }
+
+    public void submitReplenishmentRequest(String medicationName, int amount) {
+        Medicine medicine = Inventory.getMedicine(medicationName);
+        if (medicine != null) {
+            medicine.updateStockLevel(amount);
+        } else {
+            System.out.println("Medicine not found in inventory: " + medicationName);
+        }
     }
 }
