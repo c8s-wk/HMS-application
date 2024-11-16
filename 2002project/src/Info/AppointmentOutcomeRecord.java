@@ -1,6 +1,9 @@
 package Info;
 
-public class AppoimtmentOutcomeRecord {
+import java.util.ArrayList;
+import java.util.List;
+
+public class AppointmentOutcomeRecord {
     private String appointmentID;
     private String dateOfAppointment;
     private String typeOfService;
@@ -27,7 +30,7 @@ public class AppoimtmentOutcomeRecord {
             System.out.println("  No medications prescribed.");
         } else {
             for (Prescription prescription : prescribedMedications) {
-                System.out.println("  - " + prescription.getMedicationName() + " (Status: " + prescription.getStatus() + ")");
+                System.out.println("  - " + prescription.getMedicineName() + " (Status: " + prescription.getStatus() + ")");
             }
         }
         System.out.println("=======================================");
