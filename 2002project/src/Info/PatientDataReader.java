@@ -25,7 +25,8 @@ public class PatientDataReader {
                 String dateOfBirth = data[2];
                 String gender = data[3];
                 String bloodType = data[4];
-                String contactInfo = data[5];
+                String emailAddress = data[5];
+                String contactNumber = data[6];
 
                 // Default values for password and role
                 String password = "defaultPassword";
