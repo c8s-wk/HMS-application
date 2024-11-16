@@ -1,64 +1,38 @@
 package Info;
 
 public class Medicine {
-    private String medicineName;
-    private String dosage; // e.g., "500mg", "10ml"
+    private String name;
     private int stockLevel;
-    private int lowStockAlertLevel;
+    private int lowStockAlert;
 
-    // Constructor
-    public Medicine(String medicineName, String dosage, int stockLevel, int lowStockAlertLevel) {
-        this.medicineName = medicineName;
-        this.dosage = dosage;
+    // constructor
+    public Medicine(String name, int stockLevel, int lowStockAlert) {
+        this.name = name;
         this.stockLevel = stockLevel;
-        this.lowStockAlertLevel = lowStockAlertLevel;
+        this.lowStockAlert = lowStockAlert;
     }
 
-    // Getter and Setter methods
-    public String getMedicineName() {
-        return medicineName;
+    // update stock level
+    public void updateStockLevel(int amount) {
+        this.stockLevel += amount; //amount can be negative or positive
     }
 
-    public String getDosage() {
-        return dosage;
+    // check if stock is low
+    public boolean checkLowStock() {
+        return this.stockLevel < this.lowStockAlert; //true if stock is low
+    }
+    //get methods
+    public String getName() {
+        return name;
     }
 
     public int getStockLevel() {
         return stockLevel;
     }
 
-    public void setStockLevel(int stockLevel) {
-        this.stockLevel = stockLevel;
+    public int getLowStockAlert() {
+        return lowStockAlert;
     }
 
-    public int getLowStockAlertLevel() {
-        return lowStockAlertLevel;
-    }
-
-    public void setLowStockAlertLevel(int lowStockAlertLevel) {
-        this.lowStockAlertLevel = lowStockAlertLevel;
-    }
-
-    // Method to reduce the stock level after dispensing
-    public void dispenseMedicine(int quantity) {
-        if (stockLevel >= quantity) {
-            stockLevel -= quantity;
-            System.out.println("Dispensed " + quantity + " units of " + medicineName);
-        } else {
-            System.out.println("Insufficient stock for " + medicineName);
-        }
-    }
-
-    // Method to check if stock is below alert level
-    public boolean isStockLow() {
-        return stockLevel <= lowStockAlertLevel;
-    }
-
-    // Display medicine details
-    public void displayMedicineInfo() {
-        System.out.println("Info.Medicine Name: " + medicineName);
-        System.out.println("Dosage: " + dosage);
-        System.out.println("Stock Level: " + stockLevel);
-        System.out.println("Low Stock Alert Level: " + lowStockAlertLevel);
-    }
+    
 }
