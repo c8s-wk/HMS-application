@@ -13,7 +13,7 @@ public class Patient extends User implements PersonalInfo {
     private List<Appointment> appointments;
 
     // Constructor
-    public Patient(String patientID, String password, String role, String name, String dateOfBirth, String gender, String bloodType, String contactInfo) {
+    public Patient(String patientID, String password, String role, String name, String dateOfBirth, String gender, String bloodType, String contactInfo, String contactNumber) {
         super(patientID, password, role);
         this.name = name;
         this.dateOfBirth = dateOfBirth;

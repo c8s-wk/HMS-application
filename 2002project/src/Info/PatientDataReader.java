@@ -32,7 +32,7 @@ public class PatientDataReader {
                 String password = "defaultPassword";
                 String role = "Patient";
 
-                Patient patient = new Patient(patientID, password, role, name, dateOfBirth, gender, bloodType, contactInfo);
+                Patient patient = new Patient(patientID, password, role, name, dateOfBirth, gender, bloodType, emailAddress, contactNumber);
                 patients.add(patient);
             }
         } catch (IOException e) {
