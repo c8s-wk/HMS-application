@@ -1,101 +1,81 @@
 package Info;
 
-import Utils.CSVUtils;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Administrator extends User {
-    // Additional attributes for Info.Administrator
-    private String adminID;
 
     // Constructor
-    public Administrator(String userID, String password, String adminID) {
-        super(userID, password, "Info.Administrator");
-        this.adminID = adminID;
+    public Administrator(String userID, String password, String role) {
+        super(userID, password, role);
     }
 
-    // Getter
-    public String getAdminID() {
-        return adminID;
+    // View and Manage Hospital Staff
+    public void viewAndManageStaff(List<User> staff) {
+        System.out.println("\n--- Hospital Staff ---");
+        for (User user : staff) {
+            System.out.println(user);
+        }
     }
 
-    // Display administrator information
-    public void displayAdminInfo() {
-        displayUserInfo(); // Calls the method from Info.User class
-        System.out.println("Admin ID: " + adminID);
+    public void addStaff(List<User> staff, User newStaff) {
+        staff.add(newStaff);
+        System.out.println("New staff member added: " + newStaff);
     }
 
-    // Business logic for managing hospital staff
-    public List<String[]> viewStaff(String staffFile) {
-        return CSVUtils.readCSV(staffFile);
+    public void removeStaff(List<User> staff, String staffID) {
+        staff.removeIf(user -> user.getUserID().equals(staffID));
+        System.out.println("Staff member removed with ID: " + staffID);
     }
 
-    public void addStaff(String staffFile, String[] newStaff) {
-        List<String[]> staffRecords = CSVUtils.readCSV(staffFile);
-        staffRecords.add(newStaff);
-        CSVUtils.writeCSV(staffFile, staffRecords);
+    // View Appointments
+    public void viewAppointments(List<Appointment> appointments) {
+        System.out.println("\n--- Appointments ---");
+        for (Appointment appointment : appointments) {
+            System.out.println(appointment);
+        }
     }
 
-    public boolean updateStaff(String staffFile, String staffID, String[] updatedStaff) {
-        List<String[]> staffRecords = CSVUtils.readCSV(staffFile);
-        for (String[] record : staffRecords) {
-            if (record[0].equals(staffID)) {
-                System.arraycopy(updatedStaff, 0, record, 0, updatedStaff.length);
-                CSVUtils.writeCSV(staffFile, staffRecords);
-                return true;
+    // View and Manage Inventory
+    public void viewInventory(List<Medicine> inventory) {
+        System.out.println("\n--- Medication Inventory ---");
+        for (Medicine medicine : inventory) {
+            System.out.println(medicine);
+        }
+    }
+
+    public void updateStock(List<Medicine> inventory, String medicineName, int newStock) {
+        for (Medicine medicine : inventory) {
+            if (medicine.getName().equalsIgnoreCase(medicineName)) {
+                medicine.setStock(newStock);
+                System.out.println("Updated stock for " + medicineName + " to " + newStock);
+                return;
             }
         }
-        return false;
+        System.out.println("Medicine not found in inventory.");
     }
 
-    public boolean removeStaff(String staffFile, String staffID) {
-        List<String[]> staffRecords = CSVUtils.readCSV(staffFile);
-        boolean removed = staffRecords.removeIf(record -> record[0].equals(staffID));
-        if (removed) {
-            CSVUtils.writeCSV(staffFile, staffRecords);
-        }
-        return removed;
-    }
-
-    // Business logic for inventory management
-    public List<String[]> viewInventory(String inventoryFile) {
-        return CSVUtils.readCSV(inventoryFile);
-    }
-
-    public void addInventory(String inventoryFile, String[] newInventory) {
-        List<String[]> inventoryRecords = CSVUtils.readCSV(inventoryFile);
-        inventoryRecords.add(newInventory);
-        CSVUtils.writeCSV(inventoryFile, inventoryRecords);
-    }
-
-    public boolean updateInventory(String inventoryFile, String itemName, String[] updatedInventory) {
-        List<String[]> inventoryRecords = CSVUtils.readCSV(inventoryFile);
-        for (String[] record : inventoryRecords) {
-            if (record[0].equals(itemName)) {
-                System.arraycopy(updatedInventory, 0, record, 0, updatedInventory.length);
-                CSVUtils.writeCSV(inventoryFile, inventoryRecords);
-                return true;
+    public void updateLowStockAlert(List<Medicine> inventory, String medicineName, int newAlertLevel) {
+        for (Medicine medicine : inventory) {
+            if (medicine.getName().equalsIgnoreCase(medicineName)) {
+                medicine.setLowStockAlertLevel(newAlertLevel);
+                System.out.println("Updated low stock alert for " + medicineName + " to " + newAlertLevel);
+                return;
             }
         }
-        return false;
+        System.out.println("Medicine not found in inventory.");
     }
 
-    public boolean removeInventory(String inventoryFile, String itemName) {
-        List<String[]> inventoryRecords = CSVUtils.readCSV(inventoryFile);
-        boolean removed = inventoryRecords.removeIf(record -> record[0].equals(itemName));
-        if (removed) {
-            CSVUtils.writeCSV(inventoryFile, inventoryRecords);
+    // Approve Replenishment Requests
+    public void approveReplenishmentRequest(List<Medicine> inventory, String medicineName, int additionalStock) {
+        for (Medicine medicine : inventory) {
+            if (medicine.getName().equalsIgnoreCase(medicineName)) {
+                int newStock = medicine.getStock() + additionalStock;
+                medicine.setStock(newStock);
+                System.out.println("Approved replenishment for " + medicineName + ". New stock: " + newStock);
+                return;
+            }
         }
-        return removed;
+        System.out.println("Medicine not found in inventory.");
     }
-
-    // Method to manage hospital staff
-    /*public void manageStaff(String staffID, String action) {
-        System.out.println("Staff ID: " + staffID + " has been " + action);
-    }
-
-    // Method to manage inventory
-    public void manageInventory(String medicineName, int quantity, String action) {
-        System.out.println("Info.Medicine: " + medicineName + " has been " + action + " with quantity " + quantity);
-    }*/
 }
-
