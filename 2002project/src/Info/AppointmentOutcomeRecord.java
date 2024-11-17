@@ -11,7 +11,7 @@ public class AppointmentOutcomeRecord {
     private List<Prescription> prescribedMedications;
     private String consultationNotes;
 
-    private static final String APPOINTMENT_OUTCOME_FILE_PATH = "appointment_outcomes.csv"; // CSV file path
+    private static final String APPOINTMENT_OUTCOME_FILE_PATH = "2002project/Appointment_outcome.csv"; // CSV file path
 
     // Constructor
     public AppointmentOutcomeRecord(String appointmentID, String dateOfAppointment, String typeOfService, String consultationNotes) {
