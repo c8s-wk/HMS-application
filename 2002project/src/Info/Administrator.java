@@ -81,6 +81,14 @@ public class Administrator extends User {
         }
     }
 
+    public List<Appointment> viewAppointments() {
+    List<Appointment> allAppointments = Appointment.loadAppointmentsFromCSV();
+    if (allAppointments.isEmpty()) {
+        System.out.println("No appointments found.");
+    }
+    return allAppointments;
+}
+
     // Save staff data to CSV
     private void saveStaffToCSV(List<User> staff) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(STAFF_FILE))) {

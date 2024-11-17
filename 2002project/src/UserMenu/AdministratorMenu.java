@@ -113,7 +113,16 @@ public class AdministratorMenu {
     }
 
     private static void viewAppointments() {
-        System.out.println("Appointment details viewing not implemented yet.");
+        System.out.println("Currently testing/debugging.");
+        List<Appointment> appointments = admin.viewAppointments();
+        System.out.println("\n--- All Appointments ---");
+        if (appointments.isEmpty()) {
+                System.out.println("No appointments to display.");
+        } else {
+            for (Appointment appointment : appointments) {
+                System.out.println(appointment);
+            }
+        }
     }
 
     private static void manageInventory(Scanner scanner) {
