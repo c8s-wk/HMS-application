@@ -12,6 +12,9 @@ public class Pharmacist extends User {
     public void viewAppointmentOutcomeRecords() {
         List<AppointmentOutcomeRecord> records = AppointmentOutcomeRecord.loadAppointmentOutcomesFromCSV();
         System.out.println("--- Appointment Outcome Records ---");
+        if(records.isEmpty()){
+            System.out.println("Appointment Outcome Records is empty!");
+        }
         for (AppointmentOutcomeRecord record : records) {
             record.viewOutcomeDetails();
         }
@@ -64,6 +67,7 @@ public class Pharmacist extends User {
     public void viewMedicationInventory() {
         List<Medicine> medicines = Medicine.loadMedicinesFromCSV();
         System.out.println("--- Medication Inventory ---");
+        //System.out.println(medicines.size() + " medicines");
         for (Medicine medicine : medicines) {
             System.out.println("Name: " + medicine.getName() + ", Stock: " + medicine.getStock());
         }

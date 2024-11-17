@@ -51,7 +51,7 @@ public class Medicine {
 
     public void setReplenishmentRequest(boolean replenishmentRequest) {
         this.replenishmentRequest = replenishmentRequest;
-        updateMedicineInCSV();
+        //updateMedicineInCSV();
     }
 
     // Check if stock is below lowStockAlertLevel and update replenishmentRequest

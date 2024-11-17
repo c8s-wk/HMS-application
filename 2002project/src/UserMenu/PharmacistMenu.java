@@ -26,7 +26,11 @@ public class PharmacistMenu {
         Scanner scanner = new Scanner(System.in);
 
         switch (choice) {
-            case 1 -> pharmacist.viewAppointmentOutcomeRecords();
+            case 1 -> {
+
+                pharmacist.viewAppointmentOutcomeRecords();
+
+            }
             case 2 -> {
                 System.out.print("Enter Prescription ID to dispensed status: ");
                 String prescriptionID = scanner.nextLine();
@@ -36,11 +40,11 @@ public class PharmacistMenu {
             }
             case 3 -> pharmacist.viewMedicationInventory();
             case 4 -> {
-                System.out.print("Enter Medicine Name: ");
+                /*System.out.print("Enter Medicine Name: ");
                 String medicineName = scanner.nextLine();
                 System.out.print("Enter Additional Stock: ");
                 int additionalStock = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
+                scanner.nextLine(); // Consume newline*/
                 pharmacist.submitReplenishmentRequest();
             }
             case 5 -> {
