@@ -226,10 +226,10 @@ public class HMSApplication {
         switch (role) {
             case "Info.Patient" -> {
                 PatientMenu.displayMenu();
-                int patientChoice = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
-                PatientMenu.handleChoice(patientChoice);
-                if (patientChoice == 9) running = false; // Logout
+                //int patientChoice = scanner.nextInt();
+                //scanner.nextLine(); // Consume newline
+                PatientMenu.handleMenu();
+                //if (patientChoice == 9) running = false; // Logout
             }
             /*case "Info.Doctor" -> {
                 Map<String, String> staff = staffData.get(userID);
@@ -267,7 +267,6 @@ public class HMSApplication {
                 DoctorMenu.handleChoice(doctorChoice);
                 if (doctorChoice == 9) running = false; // Logout
             }
-
 
 
 
