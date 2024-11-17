@@ -134,6 +134,7 @@ public class HMSApplication {
         // Check for patient role
         for (Patient patient : patients) {
             if (patient.getUserID().equals(userID)) {
+                PatientMenu.setCurrentPatient(patient);
                 return "Info.Patient";
             }
         }
@@ -183,6 +184,7 @@ public class HMSApplication {
                 }
 
                 case "Info.Doctor" -> {
+                    
                     DoctorMenu.displayMenu();
                     int doctorChoice = scanner.nextInt();
                     scanner.nextLine(); // Consume newline
