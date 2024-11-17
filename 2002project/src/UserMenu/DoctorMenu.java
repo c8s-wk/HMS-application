@@ -5,6 +5,7 @@ import Info.Appointment;
 import Info.MedicalRecord;
 import Info.Patient;
 import Info.Schedule;
+import Info.AppointmentOutcomeRecord;
 
 import java.util.List;
 import java.util.Scanner;
@@ -161,26 +162,36 @@ public class DoctorMenu {
                 System.out.print("Enter type of service provided: ");
                 String serviceType = scanner.nextLine();
 
-                System.out.print("Enter prescribed medication name: ");
-                String medication = scanner.nextLine();
-
-                System.out.print("Enter medication status (default is 'Pending'): ");
-                String medicationStatus = scanner.nextLine();
-
                 System.out.print("Enter consultation notes: ");
-                String notes = scanner.nextLine();
+                String consultationNotes = scanner.nextLine();
 
+                // Create a new AppointmentOutcomeRecord
+                AppointmentOutcomeRecord outcome = new AppointmentOutcomeRecord(
+                        appointmentID,
+                        appointment.getDate(),
+                        serviceType,
+                        consultationNotes
+                );
+
+                // Add a prescription using predefined choices
+                outcome.addPrescriptionFromChoices(appointment.getPatientID(), currentDoctor.getUserID());
+
+                // Save the outcome to the CSV file
+                List<AppointmentOutcomeRecord> outcomes = AppointmentOutcomeRecord.loadAppointmentOutcomesFromCSV();
+                outcomes.add(outcome);
+                AppointmentOutcomeRecord.saveAppointmentOutcomesToCSV(outcomes);
+
+                // Update appointment status
                 appointment.setStatus("Completed");
                 System.out.println("\n--- Appointment Outcome Recorded Successfully ---");
-                System.out.println("Details:");
                 System.out.println("Service Type: " + serviceType);
-                System.out.println("Medication: " + medication + " (" + medicationStatus + ")");
-                System.out.println("Notes: " + notes);
+                System.out.println("Consultation Notes: " + consultationNotes);
                 return;
             }
         }
         System.out.println("Appointment not found.");
     }
+
 
     private static void logout() {
         System.out.println("Logging out...");

@@ -3,6 +3,7 @@ package Info;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class AppointmentOutcomeRecord {
     private String appointmentID;
@@ -46,6 +47,44 @@ public class AppointmentOutcomeRecord {
     // Add prescription
     public void addPrescription(String prescriptionID, String patientID, String doctorID, String medicineName, String status) {
         prescribedMedications.add(new Prescription(prescriptionID, appointmentID, patientID, doctorID, medicineName, status));
+    }
+
+    // Add a prescription from predefined medicine choices
+    public void addPrescriptionFromChoices(String patientID, String doctorID) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Medicine options
+        System.out.println("Select a medicine to prescribe:");
+        System.out.println("1. Paracetamol");
+        System.out.println("2. Ibuprofen");
+        System.out.println("3. Amoxicillin");
+        System.out.print("Enter your choice (1-3): ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        String selectedMedicine;
+        switch (choice) {
+            case 1 -> selectedMedicine = "Paracetamol";
+            case 2 -> selectedMedicine = "Ibuprofen";
+            case 3 -> selectedMedicine = "Amoxicillin";
+            default -> {
+                System.out.println("Invalid choice. No medicine prescribed.");
+                selectedMedicine = null;
+            }
+        }
+
+        if (selectedMedicine != null) {
+            addPrescription(
+                    "P" + System.currentTimeMillis(), // Unique prescription ID
+                    patientID,
+                    doctorID,
+                    selectedMedicine,
+                    "Pending" // Default status
+            );
+            System.out.println("Prescription added: " + selectedMedicine);
+        } else {
+            System.out.println("No valid medicine was prescribed.");
+        }
     }
 
     // View appointment outcome details
@@ -96,7 +135,7 @@ public class AppointmentOutcomeRecord {
                 .append(consultationNotes).append(",");
 
         if (prescribedMedications.isEmpty()) {
-            csv.append(""); // 没有处方
+            csv.append("");
         } else {
             for (int i = 0; i < prescribedMedications.size(); i++) {
                 Prescription prescription = prescribedMedications.get(i);
@@ -106,7 +145,7 @@ public class AppointmentOutcomeRecord {
                         .append(":")
                         .append(prescription.getStatus());
                 if (i < prescribedMedications.size() - 1) {
-                    csv.append(";"); // 使用分号分隔多个处方
+                    csv.append(";"); // Separate multiple prescriptions with a semicolon
                 }
             }
         }
@@ -114,14 +153,12 @@ public class AppointmentOutcomeRecord {
         return csv.toString();
     }
 
-
-
     // Load appointment outcomes from CSV
     public static List<AppointmentOutcomeRecord> loadAppointmentOutcomesFromCSV() {
         List<AppointmentOutcomeRecord> records = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(APPOINTMENT_OUTCOME_FILE_PATH))) {
             String line;
-            br.readLine(); // 跳过表头
+            br.readLine(); // Skip header
 
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",", -1);
@@ -137,7 +174,7 @@ public class AppointmentOutcomeRecord {
                 if (data.length > 4 && !data[4].isEmpty()) {
                     String[] prescriptions = data[4].split(";");
                     for (String prescriptionData : prescriptions) {
-                        String[] parts = prescriptionData.split(":", 3); // 包括状态
+                        String[] parts = prescriptionData.split(":", 3);
                         if (parts.length == 3) {
                             String prescriptionID = parts[0].trim();
                             String medicineName = parts[1].trim();
@@ -167,7 +204,5 @@ public class AppointmentOutcomeRecord {
         } catch (IOException e) {
             System.err.println("Error writing appointment outcomes CSV: " + e.getMessage());
         }
-
-
     }
 }
