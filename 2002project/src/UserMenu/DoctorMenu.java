@@ -79,6 +79,7 @@ public class DoctorMenu {
                 String treatment = scanner.nextLine();
                 record.addTreatment(treatment);
 
+                System.out.println("Prescriptions available: Paracetamol, Ibuprofen, Amoxicillin");
                 System.out.print("Enter new prescription: ");
                 String prescription = scanner.nextLine();
                 record.addPrescription(prescription);

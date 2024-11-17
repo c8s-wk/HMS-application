@@ -257,14 +257,6 @@ public class HMSApplication {
                     return; // Break out of the current userRole handling case
                 }
 
-
-
-
-
-
-
-
-
                 default -> {
                     System.out.println("Invalid role. Returning to login.");
                     running = false;
