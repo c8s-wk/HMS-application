@@ -16,7 +16,7 @@ public class DoctorMenu {
     private static List<Patient> patients; // The list of patients
 
     // Method to set the current doctor and patients
-    public static void setContext(Doctor doctor, List<Patient> patientList) {
+    public static void setDoctor(Doctor doctor, List<Patient> patientList) {
         currentDoctor = doctor;
         patients = patientList;
     }
