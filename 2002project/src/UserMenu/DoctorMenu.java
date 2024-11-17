@@ -90,15 +90,23 @@ public class DoctorMenu {
     }
 
     private static void setAvailability(Scanner scanner) {
-        System.out.println("\n--- Set Availability ---");
+        System.out.println("\n--- Set Slot Availability ---");
         System.out.print("Enter the date (YYYY-MM-DD): ");
         String date = scanner.nextLine();
 
         System.out.print("Enter the time (HH:MM): ");
         String time = scanner.nextLine();
 
-        currentDoctor.setAvailability(date, time);
+        System.out.print("Enter the status (Available/Unavailable): ");
+        String status = scanner.nextLine();
+
+        if (status.equalsIgnoreCase("Available") || status.equalsIgnoreCase("Unavailable")) {
+            currentDoctor.setAvailability(date, time, status);
+        } else {
+            System.out.println("Invalid status. Please enter 'Available' or 'Unavailable'.");
+        }
     }
+
 
     private static void acceptOrDeclineAppointments(Scanner scanner) {
         System.out.println("\n--- Appointment Requests ---");

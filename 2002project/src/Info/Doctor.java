@@ -148,18 +148,18 @@ public class Doctor extends User {
     }
 
     // Set availability for a specific date and time
-    public void setAvailability(String date, String time) {
+    public void setAvailability(String date, String time, String status) {
         boolean slotExists = false;
 
         for (Schedule schedule : availableSlots) {
             if (schedule.getDate().equals(date) && schedule.getTime().equals(time)) {
-                if (schedule.getStatus().equalsIgnoreCase("Available")) {
-                    System.out.println("The slot is already available.");
+                if (schedule.getStatus().equalsIgnoreCase(status)) {
+                    System.out.println("The slot is already marked as " + status + ".");
                 } else {
-                    schedule.setStatus("Available");
-                    schedule.setPatientID(null);
+                    schedule.setStatus(status);
+                    schedule.setPatientID(null); // Clear patient ID if slot is being made available or unavailable
                     Schedule.saveSchedulesToCSV(availableSlots);
-                    System.out.println("Slot updated to 'Available': " + date + " | " + time);
+                    System.out.println("Slot updated to '" + status + "': " + date + " | " + time);
                 }
                 slotExists = true;
                 break;
@@ -167,11 +167,16 @@ public class Doctor extends User {
         }
 
         if (!slotExists) {
-            availableSlots.add(new Schedule(getUserID(), date, time, "Available", null));
-            Schedule.saveSchedulesToCSV(availableSlots);
-            System.out.println("New slot added as available: " + date + " | " + time);
+            if (status.equalsIgnoreCase("Available") || status.equalsIgnoreCase("Unavailable")) {
+                availableSlots.add(new Schedule(getUserID(), date, time, status, null));
+                Schedule.saveSchedulesToCSV(availableSlots);
+                System.out.println("New slot added with status '" + status + "': " + date + " | " + time);
+            } else {
+                System.out.println("Invalid status. Please use 'Available' or 'Unavailable'.");
+            }
         }
     }
+
 
     // Release a booked slot
     public void releaseSlot(String date, String time) {
