@@ -12,6 +12,7 @@ public class Administrator extends User {
 
     private static final String STAFF_FILE = "2002project/Staff_List.csv";
     private static final String MEDICINE_FILE = "2002project/Medicine_List.csv";
+    private static final String APPOINTMENT_FILE_PATH = "2002project/Appointment.csv";
 
     public Administrator(String userID, String password, String name, String role, String gender, int age) {
         super(userID, password, role);
