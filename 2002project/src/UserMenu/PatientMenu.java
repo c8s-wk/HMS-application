@@ -3,6 +3,8 @@ package UserMenu;
 import Info.Patient;
 import Info.Appointment;
 import Info.Schedule;
+import Info.MedicalRecord;
+import Info.AppointmentOutcomeRecord;
 
 import java.util.List;
 import java.util.Scanner;
@@ -28,24 +30,41 @@ public class PatientMenu {
         System.out.print("Please enter your choice: ");
     }
 
-    public static void handleChoice(int choice) {
+    public static void handleMenu() {
         Scanner scanner = new Scanner(System.in);
-        switch (choice) {
-            case 1 -> viewMedicalRecord();
-            case 2 -> updatePersonalInfo(scanner);
-            case 3 -> viewAvailableSlots();
-            case 4 -> scheduleAppointment(scanner);
-            case 5 -> rescheduleAppointment(scanner);
-            case 6 -> cancelAppointment(scanner);
-            case 7 -> viewScheduledAppointments();
-            case 8 -> System.out.println("Logging out...");
-            default -> System.out.println("Invalid choice. Please try again.");
+        boolean isRunning = true;
+
+        while (isRunning) {
+            displayMenu();
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline character
+
+            switch (choice) {
+                case 1 -> viewMedicalRecord();
+                case 2 -> updatePersonalInfo(scanner);
+                case 3 -> viewAvailableSlots();
+                case 4 -> scheduleAppointment(scanner);
+                case 5 -> rescheduleAppointment(scanner);
+                case 6 -> cancelAppointment(scanner);
+                case 7 -> viewScheduledAppointments();
+                case 8 -> viewPastAppointmentRecords();
+                case 9 -> {
+                    System.out.println("Logging out...");
+                    isRunning = false; // Exit the menu loop
+                }
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
         }
     }
 
     private static void viewMedicalRecord() {
-        System.out.println("\n--- Medical Record ---");
-        System.out.println(currentPatient.getMedicalRecord());
+        if (currentPatient != null) {
+            System.out.println("\n--- Medical Record ---");
+            MedicalRecord record = currentPatient.getMedicalRecord();
+            System.out.println(record);
+        } else {
+            System.out.println("No patient is currently logged in.");
+        }
     }
 
     private static void updatePersonalInfo(Scanner scanner) {
@@ -143,6 +162,30 @@ public class PatientMenu {
             for (Appointment appointment : appointments) {
                 System.out.println(appointment);
             }
+        }
+    }
+
+    private static void viewPastAppointmentRecords() {
+        if (currentPatient != null) {
+            System.out.println("\n--- Past Appointment Outcome Records ---");
+
+            // Load all appointment outcomes
+            List<AppointmentOutcomeRecord> outcomeRecords = AppointmentOutcomeRecord.loadAppointmentOutcomesFromCSV();
+
+            // Filter records for the current patient
+            boolean recordsFound = false;
+            for (AppointmentOutcomeRecord record : outcomeRecords) {
+                if (record.getAppointmentID().startsWith(currentPatient.getUserID())) {
+                    recordsFound = true;
+                    record.viewOutcomeDetails();
+                }
+            }
+
+            if (!recordsFound) {
+                System.out.println("No past appointment outcome records found.");
+            }
+        } else {
+            System.out.println("No patient is currently logged in.");
         }
     }
 }
