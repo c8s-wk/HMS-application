@@ -51,4 +51,10 @@ public class User {
         System.out.println("Role: " + role);
     }
 
+    @Override
+    public String toString() {
+        return "UserID: " + getUserID() + ", Role: " + getRole();
+    }
+
+
 }

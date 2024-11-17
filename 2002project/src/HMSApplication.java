@@ -5,6 +5,7 @@ import UserMenu.PatientMenu;
 import UserMenu.PharmacistMenu;
 import Info.Pharmacist;
 import Info.Patient;
+import Info.Administrator;
 import Info.MedicalRecord;
 
 import java.io.BufferedReader;
@@ -162,17 +163,26 @@ public class HMSApplication {
         // 根据用户角色初始化并设置 Pharmacist 对象
         Pharmacist pharmacist = null;
         if ("Info.Pharmacist".equals(userRole)) {
-            // 获取相关信息以初始化 Pharmacist 对象
+            // Fetch pharmacist details from staffData map
             Map<String, String> pharmacistData = staffData.get(userID);
             if (pharmacistData != null) {
-                String role = pharmacistData.get("Role"); // Role from staffData map
-                pharmacist = new Pharmacist(userID, "password", role);
-                PharmacistMenu.setPharmacist(pharmacist);
+                String name = pharmacistData.get("Name");
+                String role = pharmacistData.get("Role");
+                String gender = pharmacistData.get("Gender");
+                int age = Integer.parseInt(pharmacistData.get("Age")); // Extract and convert age
+
+                // Create Pharmacist object with the updated constructor
+                pharmacist = new Pharmacist(userID, "password", name, role, gender, age);
+
+                PharmacistMenu.setPharmacist(pharmacist); // Pass the Pharmacist object to the menu
             } else {
                 System.out.println("Error: Pharmacist data not found.");
                 return;
             }
         }
+
+
+
 
         while (running) {
             switch (userRole) {
@@ -215,12 +225,31 @@ public class HMSApplication {
                 }
 
                 case "Info.Administrator" -> {
-                    AdministratorMenu.displayMenu();
-                    int adminChoice = scanner.nextInt();
-                    scanner.nextLine(); // Consume newline
-                    AdministratorMenu.handleChoice(adminChoice);
-                    if (adminChoice == 5) running = false; // Logout
+                    // Initialize Administrator object
+                    Map<String, String> adminData = staffData.get(userID);
+                    if (adminData != null) {
+                        String name = adminData.get("Name");
+                        String gender = adminData.get("Gender");
+                        int age = Integer.parseInt(adminData.get("Age"));
+                        String role = adminData.get("Role");
+
+                        // Create Administrator object with the updated constructor
+                        Administrator admin = new Administrator(userID, "password", role, name, gender, age);
+                        AdministratorMenu.setAdministrator(admin); // Pass the Administrator object to the menu
+
+                        boolean adminRunning = true;
+                        while (adminRunning) {
+                            AdministratorMenu.displayMenu();
+                            int adminChoice = scanner.nextInt();
+                            scanner.nextLine(); // Consume newline
+                            AdministratorMenu.handleChoice(adminChoice);
+                            if (adminChoice == 5) adminRunning = false; // Logout
+                        }
+                    } else {
+                        System.out.println("Administrator data not found.");
+                    }
                 }
+
 
                 default -> {
                     System.out.println("Invalid role. Returning to login.");

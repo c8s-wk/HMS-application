@@ -4,6 +4,8 @@ import Info.Administrator;
 import Info.Appointment;
 import Info.Medicine;
 import Info.User;
+import Info.Doctor;
+import Info.Pharmacist;
 
 import java.util.List;
 import java.util.Scanner;
@@ -51,30 +53,52 @@ public class AdministratorMenu {
         switch (staffChoice) {
             case 1 -> {
                 List<User> staff = admin.viewStaff();
+                System.out.println("\n--- Staff List ---");
                 for (User user : staff) {
                     System.out.println(user);
                 }
             }
-            case 2 -> {
-                System.out.print("Enter Staff ID: ");
-                String staffID = scanner.nextLine();
-                System.out.print("Enter Name: ");
-                String name = scanner.nextLine();
-                System.out.print("Enter Role: ");
-                String role = scanner.nextLine();
-                System.out.print("Enter Gender: ");
-                String gender = scanner.nextLine();
-                System.out.print("Enter Age: ");
-                int age = scanner.nextInt();
-                admin.addStaff(staffID, name, role, gender, age);
-            }
-            case 3 -> {
-                System.out.print("Enter Staff ID to remove: ");
-                String staffID = scanner.nextLine();
-                admin.removeStaff(staffID);
-            }
+            case 2 -> addStaff(scanner);
+            case 3 -> removeStaff(scanner);
             default -> System.out.println("Invalid choice.");
         }
+    }
+
+    private static void addStaff(Scanner scanner) {
+        System.out.print("Enter Staff ID: ");
+        String staffID = scanner.nextLine();
+        System.out.print("Enter Name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter Role (Doctor/Pharmacist/Administrator): ");
+        String role = scanner.nextLine();
+        System.out.print("Enter Gender: ");
+        String gender = scanner.nextLine();
+        System.out.print("Enter Age: ");
+        int age = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        User newStaff;
+        switch (role.toLowerCase()) {
+            case "doctor" -> newStaff = new Doctor(staffID, "password", name, gender, age);
+            case "pharmacist" -> newStaff = new Pharmacist(staffID, "password", name);
+            case "administrator" -> newStaff = new Administrator(staffID, "password", role, name, gender, age);
+            default -> {
+                System.out.println("Invalid role specified.");
+                return;
+            }
+        }
+
+        List<User> staffList = admin.viewStaff();
+        admin.addStaff(staffList, newStaff);
+        System.out.println("Staff member added successfully.");
+    }
+
+    private static void removeStaff(Scanner scanner) {
+        System.out.print("Enter Staff ID to remove: ");
+        String staffID = scanner.nextLine();
+
+        List<User> staffList = admin.viewStaff();
+        admin.removeStaff(staffList, staffID);
     }
 
     private static void viewAppointments() {
