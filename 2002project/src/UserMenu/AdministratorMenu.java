@@ -79,9 +79,9 @@ public class AdministratorMenu {
 
         User newStaff;
         switch (role.toLowerCase()) {
-            case "doctor" -> newStaff = new Doctor(staffID, "password", name, gender, age);
-            case "pharmacist" -> newStaff = new Pharmacist(staffID, "password", name);
-            case "administrator" -> newStaff = new Administrator(staffID, "password", role, name, gender, age);
+            case "doctor" -> newStaff = new Doctor(staffID, "password", name, role, gender, age);
+            case "pharmacist" -> newStaff = new Pharmacist(staffID, "password", name, role, gender,age);
+            case "administrator" -> newStaff = new Administrator(staffID, "password",name, role, gender, age);
             default -> {
                 System.out.println("Invalid role specified.");
                 return;
