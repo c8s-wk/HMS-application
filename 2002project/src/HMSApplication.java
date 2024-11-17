@@ -6,6 +6,7 @@ import UserMenu.PharmacistMenu;
 import Info.Pharmacist;
 import Info.Patient;
 import Info.MedicalRecord;
+import Info.Administrator;
 
 import java.io.*;
 import java.util.*;
