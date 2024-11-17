@@ -40,20 +40,17 @@ public class DoctorMenu {
             case 1 -> viewPatientMedicalRecords();
             case 2 -> updatePatientMedicalRecords(scanner);
             case 3 -> currentDoctor.viewSchedule();
+            case 4 -> setAvailability(scanner);
             case 5 -> acceptOrDeclineAppointments(scanner);
             case 6 -> viewUpcomingAppointments();
             case 7 -> recordAppointmentOutcome(scanner);
-            case 8 -> {
-                System.out.println("Logging out...");
-                currentDoctor = null; // Clear the context
-                patients = null;
-            }
+            case 8 -> logout();
             default -> System.out.println("Invalid choice. Please try again.");
         }
     }
 
     private static void viewPatientMedicalRecords() {
-        System.out.println("Viewing Medical Records of Patients under Care:");
+        System.out.println("\n--- Viewing Medical Records of Patients under Care ---");
         for (Appointment appointment : currentDoctor.getAppointments()) {
             for (Patient patient : patients) {
                 if (patient.getUserID().equals(appointment.getPatientID())) {
@@ -92,9 +89,7 @@ public class DoctorMenu {
         System.out.println("Patient not found.");
     }
 
-    public void setAvailability(String filePath) {
-        Scanner scanner = new Scanner(System.in);
-
+    private static void setAvailability(Scanner scanner) {
         System.out.println("\n--- Set Availability ---");
         System.out.print("Enter the date (YYYY-MM-DD): ");
         String date = scanner.nextLine();
@@ -102,37 +97,11 @@ public class DoctorMenu {
         System.out.print("Enter the time (HH:MM): ");
         String time = scanner.nextLine();
 
-        // Load current schedules
-        List<Schedule> schedules = Schedule.loadSchedulesFromCSV();
-
-        // Check if the slot already exists
-        for (Schedule schedule : schedules) {
-            if (schedule.getDoctorID().equals(currentDoctor.getUserID()) &&
-                    schedule.getDate().equals(date) &&
-                    schedule.getTime().equals(time)) {
-
-                if (schedule.getStatus().equalsIgnoreCase("Available")) {
-                    System.out.println("This slot is already marked as available.");
-                } else {
-                    schedule.setStatus("Available");
-                    schedule.setPatientID(null);
-                    System.out.println("The slot has been updated to 'Available'.");
-                }
-
-                // Save updated schedules and return
-                Schedule.saveSchedulesToCSV(schedules);
-                return;
-            }
-        }
-
-        // If the slot does not exist, add a new schedule entry
-        schedules.add(new Schedule(currentDoctor.getUserID(), date, time, "Available", null));
-        Schedule.saveSchedulesToCSV(schedules);
-        System.out.println("New available slot added: " + date + " " + time);
+        currentDoctor.setAvailability(date, time);
     }
 
     private static void acceptOrDeclineAppointments(Scanner scanner) {
-        System.out.println("Appointment Requests:");
+        System.out.println("\n--- Appointment Requests ---");
         boolean hasRequests = false;
 
         for (Appointment appointment : currentDoctor.getAppointments()) {
@@ -160,7 +129,7 @@ public class DoctorMenu {
     }
 
     private static void viewUpcomingAppointments() {
-        System.out.println("Upcoming Appointments:");
+        System.out.println("\n--- Upcoming Appointments ---");
         boolean hasUpcomingAppointments = false;
 
         for (Appointment appointment : currentDoctor.getAppointments()) {
@@ -194,7 +163,7 @@ public class DoctorMenu {
                 String notes = scanner.nextLine();
 
                 appointment.setStatus("Completed");
-                System.out.println("Appointment outcome recorded successfully!");
+                System.out.println("\n--- Appointment Outcome Recorded Successfully ---");
                 System.out.println("Details:");
                 System.out.println("Service Type: " + serviceType);
                 System.out.println("Medication: " + medication + " (" + medicationStatus + ")");
@@ -203,5 +172,11 @@ public class DoctorMenu {
             }
         }
         System.out.println("Appointment not found.");
+    }
+
+    private static void logout() {
+        System.out.println("Logging out...");
+        currentDoctor = null; // Clear the context
+        patients = null;
     }
 }

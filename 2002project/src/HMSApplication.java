@@ -1,3 +1,4 @@
+import Info.Doctor;
 import UserMenu.AdministratorMenu;
 import UserMenu.DoctorMenu;
 import UserMenu.PatientMenu;
@@ -185,11 +186,18 @@ public class HMSApplication {
 
                 case "Info.Doctor" -> {
 
-                    DoctorMenu.displayMenu();
-                    int doctorChoice = scanner.nextInt();
-                    scanner.nextLine(); // Consume newline
-                    DoctorMenu.handleChoice(doctorChoice);
-                    if (doctorChoice == 8) running = false; // Logout
+                    Doctor currentDoctor = Doctor.getDoctorById(userID); // Fetch the logged-in doctor by ID
+                    if (currentDoctor != null) {
+                        DoctorMenu.setContext(currentDoctor, patients); // Set the doctor and patient context
+                        DoctorMenu.displayMenu();
+                        int doctorChoice = scanner.nextInt();
+                        scanner.nextLine(); // Consume newline
+                        DoctorMenu.handleChoice(doctorChoice);
+                        if (doctorChoice == 8) running = false; // Logout
+                    } else {
+                        System.out.println("Doctor not found. Returning to login.");
+                        running = false;
+                    }
                 }
 
                 case "Info.Pharmacist" -> {

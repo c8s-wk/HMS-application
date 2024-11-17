@@ -57,21 +57,28 @@ public class AdministratorMenu {
     }
 
     private static void manageHospitalStaff(Scanner scanner) {
-        System.out.println("\n--- Manage Hospital Staff ---");
-        System.out.println("1. View Staff");
-        System.out.println("2. Add Staff");
-        System.out.println("3. Remove Staff");
-        System.out.print("Enter your choice: ");
-        int staffChoice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        boolean managingStaff = true;
 
-        switch (staffChoice) {
-            case 1 -> admin.viewAndManageStaff(staff);
-            case 2 -> addStaff(scanner);
-            case 3 -> removeStaff(scanner);
-            default -> System.out.println("Invalid choice.");
+        while (managingStaff) {
+            System.out.println("\n--- Manage Hospital Staff ---");
+            System.out.println("1. View Staff");
+            System.out.println("2. Add Staff");
+            System.out.println("3. Remove Staff");
+            System.out.println("4. Return to Main Menu");
+            System.out.print("Enter your choice: ");
+            int staffChoice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (staffChoice) {
+                case 1 -> admin.viewAndManageStaff(staff);
+                case 2 -> addStaff(scanner);
+                case 3 -> removeStaff(scanner);
+                case 4 -> managingStaff = false; // Exit the staff management menu
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
         }
     }
+
 
     private static void addStaff(Scanner scanner) {
         System.out.print("Enter Staff ID: ");
