@@ -4,6 +4,7 @@ import Info.Doctor;
 import Info.Appointment;
 import Info.MedicalRecord;
 import Info.Patient;
+import Info.Schedule;
 
 import java.util.List;
 import java.util.Scanner;
@@ -91,13 +92,43 @@ public class DoctorMenu {
         System.out.println("Patient not found.");
     }
 
-    private static void setAvailability(Scanner scanner) {
+    public void setAvailability(String filePath) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("\n--- Set Availability ---");
         System.out.print("Enter the date (YYYY-MM-DD): ");
         String date = scanner.nextLine();
+
         System.out.print("Enter the time (HH:MM): ");
         String time = scanner.nextLine();
-        currentDoctor.setAvailability(date, time);
-        System.out.println("Availability set successfully!");
+
+        // Load current schedules
+        List<Schedule> schedules = Schedule.loadSchedulesFromCSV();
+
+        // Check if the slot already exists
+        for (Schedule schedule : schedules) {
+            if (schedule.getDoctorID().equals(currentDoctor.getUserID()) &&
+                    schedule.getDate().equals(date) &&
+                    schedule.getTime().equals(time)) {
+
+                if (schedule.getStatus().equalsIgnoreCase("Available")) {
+                    System.out.println("This slot is already marked as available.");
+                } else {
+                    schedule.setStatus("Available");
+                    schedule.setPatientID(null);
+                    System.out.println("The slot has been updated to 'Available'.");
+                }
+
+                // Save updated schedules and return
+                Schedule.saveSchedulesToCSV(schedules);
+                return;
+            }
+        }
+
+        // If the slot does not exist, add a new schedule entry
+        schedules.add(new Schedule(currentDoctor.getUserID(), date, time, "Available", null));
+        Schedule.saveSchedulesToCSV(schedules);
+        System.out.println("New available slot added: " + date + " " + time);
     }
 
     private static void acceptOrDeclineAppointments(Scanner scanner) {

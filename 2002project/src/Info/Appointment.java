@@ -41,13 +41,17 @@ public class Appointment {
         return date;
     }
 
+    public String getTime() {
+        return time;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
     public void setDate(String date) {
         this.date = date;
         updateAppointmentInCSV();
-    }
-
-    public String getTime() {
-        return time;
     }
 
     public void setTime(String time) {
@@ -55,141 +59,109 @@ public class Appointment {
         updateAppointmentInCSV();
     }
 
-    public String getStatus() {
-        return status;
-    }
-
     public void setStatus(String status) {
         this.status = status;
         updateAppointmentInCSV();
     }
 
-    // Load all appointments from CSV
-    public static List<Appointment> loadAppointmentsFromCSV(String filePath) {
-        List<Appointment> appointments = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            // Skip header
-            br.readLine();
+    // Generate a unique Appointment ID
+    public static String generateAppointmentID() {
+        List<Appointment> appointments = loadAppointmentsFromCSV();
+        int maxID = appointments.stream()
+                .mapToInt(a -> Integer.parseInt(a.getAppointmentID().replace("A", "")))
+                .max()
+                .orElse(0);
+        return "A" + (maxID + 1);
+    }
 
-            // Read each record
+    // Load appointments from CSV
+    public static List<Appointment> loadAppointmentsFromCSV() {
+        List<Appointment> appointments = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
+            br.readLine(); // Skip header
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                if (data.length < 6) {
-                    System.err.println("Invalid row in Appointment CSV: " + line);
-                    continue;
-                }
-
-                String appointmentID = data[0];
-                String patientID = data[1];
-                String doctorID = data[2];
-                String date = data[3];
-                String time = data[4];
-                String status = data[5];
-
-                appointments.add(new Appointment(appointmentID, patientID, doctorID, date, time, status));
+                if (data.length < 6) continue;
+                appointments.add(new Appointment(data[0], data[1], data[2], data[3], data[4], data[5]));
             }
         } catch (IOException e) {
-            System.err.println("Error reading Appointment CSV: " + e.getMessage());
+            System.err.println("Error loading appointments: " + e.getMessage());
         }
         return appointments;
     }
 
-    // Save all appointments to CSV
-    public static void saveAppointmentsToCSV(String filePath, List<Appointment> appointments) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
-            // Write header
+    // Save appointments to CSV
+    public static void saveAppointmentsToCSV(List<Appointment> appointments) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
             bw.write("AppointmentID,PatientID,DoctorID,Date,Time,Status");
             bw.newLine();
-
-            // Write data
             for (Appointment appointment : appointments) {
                 bw.write(appointment.toCSV());
                 bw.newLine();
             }
         } catch (IOException e) {
-            System.err.println("Error saving Appointment CSV: " + e.getMessage());
+            System.err.println("Error saving appointments: " + e.getMessage());
         }
     }
 
     // Update appointment in CSV
     private void updateAppointmentInCSV() {
-        List<Appointment> appointments = loadAppointmentsFromCSV(FILE_PATH);
+        List<Appointment> appointments = loadAppointmentsFromCSV();
         for (int i = 0; i < appointments.size(); i++) {
             if (appointments.get(i).getAppointmentID().equals(this.appointmentID)) {
-                appointments.set(i, this); // Update the appointment
+                appointments.set(i, this);
                 break;
             }
         }
-        saveAppointmentsToCSV(FILE_PATH, appointments);
+        saveAppointmentsToCSV(appointments);
     }
 
-    // Schedule a new appointment
+    // Schedule an appointment
     public static boolean scheduleAppointment(Appointment appointment) {
-        List<Appointment> appointments = loadAppointmentsFromCSV(FILE_PATH);
-
-        // Check for slot availability
+        List<Appointment> appointments = loadAppointmentsFromCSV();
         for (Appointment existing : appointments) {
             if (existing.getDoctorID().equals(appointment.getDoctorID())
                     && existing.getDate().equals(appointment.getDate())
                     && existing.getTime().equals(appointment.getTime())
-                    && existing.getStatus().equals("Accepted")) {
+                    && existing.getStatus().equalsIgnoreCase("Accepted")) {
                 System.out.println("The selected time slot is already booked.");
                 return false;
             }
         }
-
         appointments.add(appointment);
-        saveAppointmentsToCSV(FILE_PATH, appointments);
-        System.out.println("Appointment scheduled successfully.");
+        saveAppointmentsToCSV(appointments);
         return true;
     }
 
-    // Reschedule an existing appointment
+    // Reschedule an appointment
     public static boolean rescheduleAppointment(String appointmentID, String newDate, String newTime) {
-        List<Appointment> appointments = loadAppointmentsFromCSV(FILE_PATH);
-
+        List<Appointment> appointments = loadAppointmentsFromCSV();
         for (Appointment appointment : appointments) {
             if (appointment.getAppointmentID().equals(appointmentID)) {
-                // Check for conflicts
-                for (Appointment existing : appointments) {
-                    if (existing.getDoctorID().equals(appointment.getDoctorID())
-                            && existing.getDate().equals(newDate)
-                            && existing.getTime().equals(newTime)
-                            && existing.getStatus().equals("Accepted")) {
-                        System.out.println("The new time slot is already booked.");
-                        return false;
-                    }
-                }
-                // Update the appointment
                 appointment.setDate(newDate);
                 appointment.setTime(newTime);
-                saveAppointmentsToCSV(FILE_PATH, appointments);
-                System.out.println("Appointment rescheduled successfully.");
+                saveAppointmentsToCSV(appointments);
                 return true;
             }
         }
-        System.out.println("Appointment not found.");
         return false;
     }
 
     // Cancel an appointment
     public static boolean cancelAppointment(String appointmentID) {
-        List<Appointment> appointments = loadAppointmentsFromCSV(FILE_PATH);
-
-        for (int i = 0; i < appointments.size(); i++) {
-            if (appointments.get(i).getAppointmentID().equals(appointmentID)) {
-                appointments.get(i).setStatus("Cancelled");
-                saveAppointmentsToCSV(FILE_PATH, appointments);
-                System.out.println("Appointment cancelled successfully.");
+        List<Appointment> appointments = loadAppointmentsFromCSV();
+        for (Appointment appointment : appointments) {
+            if (appointment.getAppointmentID().equals(appointmentID)) {
+                appointment.setStatus("Cancelled");
+                saveAppointmentsToCSV(appointments);
                 return true;
             }
         }
-        System.out.println("Appointment not found.");
         return false;
     }
 
-    // Convert appointment to CSV format
+    // Convert to CSV format
     public String toCSV() {
         return String.join(",", appointmentID, patientID, doctorID, date, time, status);
     }
