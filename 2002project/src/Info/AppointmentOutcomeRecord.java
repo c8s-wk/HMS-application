@@ -115,6 +115,7 @@ public class AppointmentOutcomeRecord {
     }
 
 
+
     // Load appointment outcomes from CSV
     public static List<AppointmentOutcomeRecord> loadAppointmentOutcomesFromCSV() {
         List<AppointmentOutcomeRecord> records = new ArrayList<>();
