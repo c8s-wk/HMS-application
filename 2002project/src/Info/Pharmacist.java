@@ -3,9 +3,27 @@ package Info;
 import java.util.List;
 
 public class Pharmacist extends User {
+    private String name;
+    private String gender;
+    private int age;
 
-    public Pharmacist(String userID, String password, String role) {
-        super(userID, password, role);
+    public Pharmacist(String userID, String password, String name, String role, String gender, int age) {
+        super(userID, "password", role); // Assuming default password for simplicity
+        this.name = name;
+        this.gender = gender;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public int getAge() {
+        return age;
     }
 
 
@@ -83,6 +101,16 @@ public class Pharmacist extends User {
             medicine.checkAndSetReplenishmentRequest();
         }
         System.out.println("Submit Replenishment Request Successfully");
+    }
+
+    @Override
+    public String toString() {
+        return "Pharmacist{" +
+                "userID='" + getUserID() + '\'' +
+                ", name='" + name + '\'' +
+                ", gender='" + gender + '\'' +
+                ", age=" + age +
+                '}';
     }
 
 

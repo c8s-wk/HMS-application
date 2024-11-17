@@ -17,7 +17,7 @@ public class Doctor extends User {
 
     private static List<Doctor> allDoctors = new ArrayList<>();
 
-    public Doctor(String userID, String password, String name, String gender, int age) {
+    public Doctor(String userID, String password, String role, String name, String gender, int age) {
         super(userID, password, "Doctor");
         this.name = name;
         this.gender = gender;
@@ -27,6 +27,27 @@ public class Doctor extends User {
         loadAppointmentsFromCSV();
         loadAvailableSlotsFromCSV();
     }
+
+    // Getter for UserID (inherited from User class)
+    public String getUserID() {
+        return super.getUserID();
+    }
+
+    // Getter for Name
+    public String getName() {
+        return name;
+    }
+
+    // Getter for Gender
+    public String getGender() {
+        return gender;
+    }
+
+    // Getter for Age
+    public int getAge() {
+        return age;
+    }
+
 
     // Static method to retrieve all doctors
     public static List<Doctor> getAllDoctors() {
@@ -51,7 +72,7 @@ public class Doctor extends User {
                 int age = Integer.parseInt(data[4].trim());
 
                 if ("Doctor".equalsIgnoreCase(role)) {
-                    allDoctors.add(new Doctor(userID, "password", name, gender, age));
+                    allDoctors.add(new Doctor(userID, "password", role, name, gender, age));
                 }
             }
         } catch (IOException e) {

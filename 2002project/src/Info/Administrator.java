@@ -3,15 +3,35 @@ package Info;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Administrator extends User {
+    private String name;
+    private String gender;
+    private int age;
 
     private static final String STAFF_FILE = "2002project/Staff_List.csv";
     private static final String MEDICINE_FILE = "2002project/Medicine_List.csv";
+    private static final String APPOINTMENT_FILE_PATH = "2002project/Appointment.csv";
 
-    // Constructor
-    public Administrator(String userID, String password) {
-        super(userID, password, "Administrator");
+    public Administrator(String userID, String password, String name, String role, String gender, int age) {
+        super(userID, password, role);
+        this.name = name;
+        this.gender = gender;
+        this.age = age;
+    }
+
+    // Getters and Setters
+    public String getName() {
+        return name;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public int getAge() {
+        return age;
     }
 
     // View all staff
@@ -30,7 +50,12 @@ public class Administrator extends User {
                 String gender = data[3].trim();
                 int age = Integer.parseInt(data[4].trim());
 
-                staff.add(new User(staffID, "password", role)); // Role can be Doctor, Pharmacist, etc.
+                switch (role.toLowerCase()) {
+                    case "doctor" -> staff.add(new Doctor(staffID, "password",name,role, gender, age));
+                    case "pharmacist" -> staff.add(new Pharmacist(staffID, "password",name,role, gender ,age));
+                    case "administrator" -> staff.add(new Administrator(staffID, "password", name,role, gender, age));
+                    default -> System.err.println("Unknown role: " + role + " for Staff ID: " + staffID);
+                }
             }
         } catch (IOException e) {
             System.err.println("Error reading staff file: " + e.getMessage());
@@ -39,53 +64,55 @@ public class Administrator extends User {
     }
 
     // Add a new staff member
-    public void addStaff(String staffID, String name, String role, String gender, int age) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(STAFF_FILE, true))) {
-            bw.write(String.join(",", staffID, name, role, gender, String.valueOf(age)));
-            bw.newLine();
-            System.out.println("Staff member added successfully.");
-        } catch (IOException e) {
-            System.err.println("Error adding staff: " + e.getMessage());
-        }
+    public void addStaff(List<User> staff, User newStaff) {
+        staff.add(newStaff);
+        saveStaffToCSV(staff);
+        System.out.println("Staff member added successfully.");
     }
 
     // Remove a staff member
-    public void removeStaff(String staffID) {
-        List<String> lines = new ArrayList<>();
-        boolean staffFound = false;
-        try (BufferedReader br = new BufferedReader(new FileReader(STAFF_FILE))) {
-            String line;
-            String header = br.readLine(); // Read and store header
-            lines.add(header);
-
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",", -1);
-                if (!data[0].trim().equals(staffID)) {
-                    lines.add(line); // Retain other lines
-                } else {
-                    staffFound = true;
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading staff file: " + e.getMessage());
-        }
-
-        if (!staffFound) {
-            System.out.println("Staff ID not found.");
-            return;
-        }
-
-        // Write updated data back to file
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(STAFF_FILE))) {
-            for (String line : lines) {
-                bw.write(line);
-                bw.newLine();
-            }
+    public void removeStaff(List<User> staff, String staffID) {
+        boolean removed = staff.removeIf(user -> user.getUserID().equals(staffID));
+        if (removed) {
+            saveStaffToCSV(staff);
             System.out.println("Staff member removed successfully.");
-        } catch (IOException e) {
-            System.err.println("Error updating staff file: " + e.getMessage());
+        } else {
+            System.out.println("Staff member with ID " + staffID + " not found.");
         }
     }
+
+    public List<Appointment> viewAppointments() {
+    List<Appointment> allAppointments = Appointment.loadAppointmentsFromCSV();
+    if (allAppointments.isEmpty()) {
+        System.out.println("No appointments found.");
+    }
+    return allAppointments;
+}
+
+    // Save staff data to CSV
+    private void saveStaffToCSV(List<User> staff) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(STAFF_FILE))) {
+            bw.write("Staff ID,Name,Role,Gender,Age");
+            bw.newLine();
+            for (User user : staff) {
+                if (user instanceof Doctor) {
+                    Doctor doctor = (Doctor) user; // Explicit cast
+                    bw.write(doctor.getUserID() + "," + doctor.getName() + ",Doctor," + doctor.getGender() + "," + doctor.getAge());
+                } else if (user instanceof Pharmacist) {
+                    Pharmacist pharmacist = (Pharmacist) user; // Explicit cast
+                    bw.write(pharmacist.getUserID() + "," + pharmacist.getName() + ",Pharmacist,,");
+                } else if (user instanceof Administrator) {
+                    Administrator admin = (Administrator) user; // Explicit cast
+                    bw.write(admin.getUserID() + "," + admin.getName() + ",Administrator," + admin.getGender() + "," + admin.getAge());
+                }
+                bw.newLine();
+            }
+            System.out.println("Staff data saved to file.");
+        } catch (IOException e) {
+            System.err.println("Error writing staff data to file: " + e.getMessage());
+        }
+    }
+
 
     // View medicine inventory
     public List<Medicine> viewInventory() {
@@ -167,5 +194,15 @@ public class Administrator extends User {
         } catch (IOException e) {
             System.err.println("Error updating inventory file: " + e.getMessage());
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Administrator{" +
+                "userID='" + getUserID() + '\'' +
+                ", name='" + name + '\'' +
+                ", gender='" + gender + '\'' +
+                ", age=" + age +
+                '}';
     }
 }
