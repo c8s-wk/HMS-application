@@ -4,6 +4,7 @@ import Info.Patient;
 import Info.Appointment;
 import Info.Schedule;
 import Info.MedicalRecord;
+import Info.AppointmentOutcomeRecord;
 
 import java.util.List;
 import java.util.Scanner;
@@ -167,7 +168,22 @@ public class PatientMenu {
     private static void viewPastAppointmentRecords() {
         if (currentPatient != null) {
             System.out.println("\n--- Past Appointment Outcome Records ---");
-            // Placeholder: Implement logic to view past outcomes
+
+            // Load all appointment outcomes
+            List<AppointmentOutcomeRecord> outcomeRecords = AppointmentOutcomeRecord.loadAppointmentOutcomesFromCSV();
+
+            // Filter records for the current patient
+            boolean recordsFound = false;
+            for (AppointmentOutcomeRecord record : outcomeRecords) {
+                if (record.getAppointmentID().startsWith(currentPatient.getUserID())) {
+                    recordsFound = true;
+                    record.viewOutcomeDetails();
+                }
+            }
+
+            if (!recordsFound) {
+                System.out.println("No past appointment outcome records found.");
+            }
         } else {
             System.out.println("No patient is currently logged in.");
         }
