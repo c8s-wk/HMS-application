@@ -24,6 +24,7 @@ public class Patient extends User {
     public String getName() {
         return medicalRecord.getName();
     }
+    public String getPassword() {return this.password;}
 
     public String getDateOfBirth() {
         return medicalRecord.getDateOfBirth();
