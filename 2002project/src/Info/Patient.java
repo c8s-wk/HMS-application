@@ -20,6 +20,39 @@ public class Patient extends User {
         return medicalRecord;
     }
 
+    // Getters and setters using MedicalRecord attributes
+    public String getName() {
+        return medicalRecord.getName();
+    }
+
+    public String getDateOfBirth() {
+        return medicalRecord.getDateOfBirth();
+    }
+
+    public String getGender() {
+        return medicalRecord.getGender();
+    }
+
+    public String getBloodType() {
+        return medicalRecord.getBloodType();
+    }
+
+    public String getEmailAddress() {
+        return medicalRecord.getEmailAddress();
+    }
+
+    public void setEmailAddress(String newEmailAddress) {
+        medicalRecord.setEmailAddress(newEmailAddress);
+    }
+
+    public String getContactNumber() {
+        return medicalRecord.getContactNumber();
+    }
+
+    public void setContactNumber(String newContactNumber) {
+        medicalRecord.setContactNumber(newContactNumber);
+    }
+
     public boolean scheduleAppointment(Appointment newAppointment) {
         List<Schedule> schedules = Schedule.loadSchedulesFromCSV();
         if (Schedule.bookSlot(schedules, newAppointment.getDoctorID(), newAppointment.getDate(), newAppointment.getTime(), getUserID())) {
