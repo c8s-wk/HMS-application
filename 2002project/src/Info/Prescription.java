@@ -12,7 +12,7 @@ public class Prescription {
     private String medicineName;
     private String status;
 
-    private static final String PRESCRIPTION_FILE_PATH = "prescriptions.csv"; // The CSV file path
+    private static final String PRESCRIPTION_FILE_PATH = "2002project/prescription.csv"; // The CSV file path
 
     // Constructor
     public Prescription(String prescriptionID, String appointmentID, String patientID, String doctorID, String medicineName, String status) {
