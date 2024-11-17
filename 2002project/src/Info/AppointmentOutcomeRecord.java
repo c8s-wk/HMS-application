@@ -11,7 +11,7 @@ public class AppointmentOutcomeRecord {
     private List<Prescription> prescribedMedications;
     private String consultationNotes;
 
-    private static final String APPOINTMENT_OUTCOME_FILE_PATH = "2002project/Appointment_outcome.csv"; // CSV file path
+    private static final String APPOINTMENT_OUTCOME_FILE_PATH = "2002project/Appointment_outcome.csv";
 
     // Constructor
     public AppointmentOutcomeRecord(String appointmentID, String dateOfAppointment, String typeOfService, String consultationNotes) {
@@ -22,7 +22,7 @@ public class AppointmentOutcomeRecord {
         this.prescribedMedications = new ArrayList<>();
     }
 
-    // Getters and Setters
+    // Getters
     public String getAppointmentID() {
         return appointmentID;
     }
@@ -60,7 +60,9 @@ public class AppointmentOutcomeRecord {
             System.out.println("  No medications prescribed.");
         } else {
             for (Prescription prescription : prescribedMedications) {
-                System.out.println("  - " + prescription.getMedicineName() + " (Status: " + prescription.getStatus() + ")");
+                System.out.println("  - Prescription ID: " + prescription.getPrescriptionID() +
+                        ", Medicine Name: " + prescription.getMedicineName() +
+                        " (Status: " + prescription.getStatus() + ")");
             }
         }
         System.out.println("=======================================");
@@ -93,15 +95,18 @@ public class AppointmentOutcomeRecord {
                 .append(typeOfService).append(",")
                 .append(consultationNotes).append(",");
 
-        // For prescribed medications, concatenate each medicine name separated by a semicolon (;)
         if (prescribedMedications.isEmpty()) {
-            csv.append(""); // Empty if no prescribed medications
+            csv.append(""); // 没有处方
         } else {
             for (int i = 0; i < prescribedMedications.size(); i++) {
-                // Append each medication's name to the CSV string, separated by a semicolon
-                csv.append(prescribedMedications.get(i).getMedicineName());
+                Prescription prescription = prescribedMedications.get(i);
+                csv.append(prescription.getPrescriptionID())
+                        .append(":")
+                        .append(prescription.getMedicineName())
+                        .append(":")
+                        .append(prescription.getStatus());
                 if (i < prescribedMedications.size() - 1) {
-                    csv.append(";");
+                    csv.append(";"); // 使用分号分隔多个处方
                 }
             }
         }
@@ -109,19 +114,17 @@ public class AppointmentOutcomeRecord {
         return csv.toString();
     }
 
+
     // Load appointment outcomes from CSV
     public static List<AppointmentOutcomeRecord> loadAppointmentOutcomesFromCSV() {
         List<AppointmentOutcomeRecord> records = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(APPOINTMENT_OUTCOME_FILE_PATH))) {
             String line;
-            // Skip header
-            br.readLine();
+            br.readLine(); // 跳过表头
 
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",", -1);
-                if (data.length < 4) {
-                    continue; // Skip invalid rows
-                }
+                if (data.length < 4) continue;
 
                 String appointmentID = data[0].trim();
                 String dateOfAppointment = data[1].trim();
@@ -130,11 +133,16 @@ public class AppointmentOutcomeRecord {
 
                 AppointmentOutcomeRecord record = new AppointmentOutcomeRecord(appointmentID, dateOfAppointment, typeOfService, consultationNotes);
 
-                // Parse prescribed medications (if any)
                 if (data.length > 4 && !data[4].isEmpty()) {
                     String[] prescriptions = data[4].split(";");
-                    for (String medication : prescriptions) {
-                        record.addPrescription("somePrescriptionID", "somePatientID", "someDoctorID", medication.trim(), "pending"); // Add sample IDs, status
+                    for (String prescriptionData : prescriptions) {
+                        String[] parts = prescriptionData.split(":", 3); // 包括状态
+                        if (parts.length == 3) {
+                            String prescriptionID = parts[0].trim();
+                            String medicineName = parts[1].trim();
+                            String status = parts[2].trim();
+                            record.addPrescription(prescriptionID, "somePatientID", "someDoctorID", medicineName, status);
+                        }
                     }
                 }
 
@@ -149,10 +157,8 @@ public class AppointmentOutcomeRecord {
     // Save appointment outcomes to CSV
     public static void saveAppointmentOutcomesToCSV(List<AppointmentOutcomeRecord> records) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(APPOINTMENT_OUTCOME_FILE_PATH))) {
-            // Write header
             bw.write("AppointmentID,DateOfAppointment,TypeOfService,ConsultationNotes,PrescribedMedications");
             bw.newLine();
-            // Write each record
             for (AppointmentOutcomeRecord record : records) {
                 bw.write(record.toCSV());
                 bw.newLine();
@@ -160,27 +166,7 @@ public class AppointmentOutcomeRecord {
         } catch (IOException e) {
             System.err.println("Error writing appointment outcomes CSV: " + e.getMessage());
         }
+
+
     }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("AppointmentOutcomeRecord{")
-                .append("appointmentID='").append(appointmentID).append('\'')
-                .append(", dateOfAppointment='").append(dateOfAppointment).append('\'')
-                .append(", typeOfService='").append(typeOfService).append('\'')
-                .append(", consultationNotes='").append(consultationNotes).append('\'')
-                .append(", prescribedMedications=[");
-
-        for (int i = 0; i < prescribedMedications.size(); i++) {
-            sb.append(prescribedMedications.get(i).getMedicineName());
-            if (i < prescribedMedications.size() - 1) {
-                sb.append(", ");
-            }
-        }
-
-        sb.append("]}");
-        return sb.toString();
-    }
-
 }

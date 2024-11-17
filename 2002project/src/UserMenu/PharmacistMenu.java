@@ -32,7 +32,7 @@ public class PharmacistMenu {
                 String prescriptionID = scanner.nextLine();
                 //System.out.print("Enter new status (e.g., Dispensed): ");
                 //String status = scanner.nextLine();
-                pharmacist.updatePrescriptionStatus(prescriptionID);
+                pharmacist.dispensedPrescriptionStatus(prescriptionID);
             }
             case 3 -> pharmacist.viewMedicationInventory();
             case 4 -> {

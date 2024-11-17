@@ -18,19 +18,46 @@ public class Pharmacist extends User {
     }
 
     // Update Prescription Status
-    public boolean updatePrescriptionStatus(String prescriptionID) {
+    public boolean dispensedPrescriptionStatus(String prescriptionID) {
+        // Load all prescriptions from CSV
         List<Prescription> prescriptions = Prescription.loadPrescriptionsFromCSV();
+        boolean prescriptionUpdated = false;
+
         for (Prescription prescription : prescriptions) {
             if (prescription.getPrescriptionID().equals(prescriptionID)) {
                 prescription.setStatus("dispensed");
-                Prescription.savePrescriptionsToCSV(prescriptions);
                 System.out.println("Prescription status updated to: " + prescription.getStatus());
-                return true;
+                prescriptionUpdated = true;
+                break;
             }
         }
-        System.out.println("Prescription not found.");
-        return false;
+
+        if (!prescriptionUpdated) {
+            System.out.println("Prescription not found.");
+            return false;
+        }
+
+        // Save updated prescriptions to CSV
+        Prescription.savePrescriptionsToCSV(prescriptions);
+
+        // Synchronize with AppointmentOutcomeRecord
+        List<AppointmentOutcomeRecord> records = AppointmentOutcomeRecord.loadAppointmentOutcomesFromCSV();
+        for (AppointmentOutcomeRecord record : records) {
+            for (Prescription prescription : record.getPrescribedMedications()) {
+                if (prescription.getPrescriptionID().equals(prescriptionID)) {
+                    prescription.setStatus("dispensed");
+                    System.out.println("Updated in AppointmentOutcomeRecord: " + record.getAppointmentID());
+                    break;
+                }
+            }
+        }
+
+        // Save updated AppointmentOutcomeRecords to CSV
+        AppointmentOutcomeRecord.saveAppointmentOutcomesToCSV(records);
+
+        return true;
     }
+
 
     // View Medication Inventory
     public void viewMedicationInventory() {
