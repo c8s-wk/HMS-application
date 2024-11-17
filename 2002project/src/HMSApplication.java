@@ -6,7 +6,6 @@ import UserMenu.PharmacistMenu;
 import Info.Pharmacist;
 import Info.Patient;
 import Info.MedicalRecord;
-import Info.Administrator;
 
 import java.io.*;
 import java.util.*;
@@ -294,45 +293,12 @@ public class HMSApplication {
                 }
             }
 
-
-                case "Info.Administrator" -> {
-                    Map<String, String> adminData = staffData.get(userID);
-                    if (adminData != null) {
-                        String name = adminData.get("Name");
-                        String gender = adminData.get("Gender");
-                        int age = Integer.parseInt(adminData.get("Age"));
-                        String role = adminData.get("Role");
-
-                        Administrator admin = new Administrator(userID, "password", role, name, gender, age);
-                        AdministratorMenu.setAdministrator(admin);
-
-                        boolean adminRunning = true;
-                        while (adminRunning) {
-                            AdministratorMenu.displayMenu();
-                            int adminChoice = scanner.nextInt();
-                            scanner.nextLine(); // Consume newline
-
-                            //System.out.println("[DEBUG] Before handleChoice: adminRunning = " + adminRunning); // Debug
-                            adminRunning = AdministratorMenu.handleChoice(adminChoice);
-                            //System.out.println("[DEBUG] After handleChoice: adminRunning = " + adminRunning); // Debug
-
-                            if (!adminRunning) {
-                                //System.out.println("[DEBUG] Exiting administrator menu and returning to login...");
-                                break; // Exit the while loop
-                            }
-                        }
-                    } else {
-                        System.out.println("Administrator data not found.");
-                    }
-                    // Ensure returning to login occurs here
-                    return; // Break out of the current userRole handling case
-                }
-
-                default -> {
-                    System.out.println("Invalid role. Returning to login.");
-                    running = false;
-                }
-            
+            case "Info.Administrator" -> {
+                AdministratorMenu.displayMenu();
+                int adminChoice = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+                AdministratorMenu.handleChoice(adminChoice);
+                if (adminChoice == 9) running = false; // Logout
             }
         }
     }
