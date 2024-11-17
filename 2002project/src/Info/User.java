@@ -4,39 +4,45 @@ public class User {
     protected String userID;
     protected String password;
     protected String role;
-    //private boolean isPasswordChanged;
 
-    //constructor
-    public User(String userID, String password, String role){
+    // Constructor
+    public User(String userID, String password, String role) {
         this.userID = userID;
         this.password = password;
         this.role = role;
     }
 
-    //getter and setter method
-    public String getUserID(){
+    // Getter for userID
+    public String getUserID() {
         return userID;
     }
 
-    public String getRole(){
+    // Getter for role
+    public String getRole() {
         return role;
     }
 
+    // Getter for password (this is the method you are missing)
+    public String getPassword() {
+        return password;
+    }
+
+    // Setter for password
     public void setPassword(String password) {
         this.password = password;
     }
 
+    // Setter for role
     public void setRole(String role) {
         this.role = role;
     }
 
-
-    //login
-    public boolean Login(String inputPassword){
+    // Login method
+    public boolean Login(String inputPassword) {
         return this.password.equals(inputPassword);
     }
 
-    //to change password
+    // Change password method
     public boolean changePassword(String oldPassword, String newPassword) {
         if (Login(oldPassword)) {
             this.password = newPassword;
@@ -45,10 +51,9 @@ public class User {
         return false;
     }
 
-    //to display user details
+    // Display user information
     public void displayUserInfo() {
-        System.out.println("Info.User ID: " + userID);
+        System.out.println("User ID: " + userID);
         System.out.println("Role: " + role);
     }
-
 }

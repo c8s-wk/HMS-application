@@ -8,6 +8,7 @@ public class Pharmacist extends User {
         super(userID, password, role);
     }
 
+
     // View Appointment Outcome Records (Prescriptions)
     public void viewAppointmentOutcomeRecords() {
         List<AppointmentOutcomeRecord> records = AppointmentOutcomeRecord.loadAppointmentOutcomesFromCSV();
