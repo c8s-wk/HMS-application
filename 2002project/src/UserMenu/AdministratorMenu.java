@@ -33,10 +33,22 @@ public class AdministratorMenu {
         Scanner scanner = new Scanner(System.in);
 
         switch (choice) {
-            case 1 -> System.out.println("Managing Hospital Staff...");
-            case 2 -> System.out.println("Viewing Appointments...");
-            case 3 -> System.out.println("Managing Inventory...");
-            case 4 -> System.out.println("Approving Replenishment Requests...");
+            case 1 -> {
+                System.out.println("Managing Hospital Staff...");
+                manageStaff(scanner);
+            }
+            case 2 -> {
+                System.out.println("Viewing Appointments...");
+                viewAppointments();
+            }
+            case 3 -> {
+                System.out.println("Managing Inventory...");
+                manageInventory(scanner);
+            }
+            case 4 -> {
+                System.out.println("Approving Replenishment Requests...");
+                approveReplenishmentRequest(scanner);
+            }
             case 5 -> {
                 System.out.println("Logging out...");
                 //System.out.println("[DEBUG] Exiting handleChoice with return = false"); // Debug line
