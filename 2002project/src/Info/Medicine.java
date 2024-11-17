@@ -8,6 +8,7 @@ public class Medicine {
     private String name;
     private int stock;
     private int lowStockAlertLevel;
+    private boolean replenishmentRequest;
 
     private static final String MEDICINE_FILE_PATH = "2002project/Medicine_List.csv"; // Update with the correct CSV file path
 
@@ -16,6 +17,7 @@ public class Medicine {
         this.name = name;
         this.stock = stock;
         this.lowStockAlertLevel = lowStockAlertLevel;
+        this.replenishmentRequest = stock < lowStockAlertLevel;
     }
 
     // Getters and Setters
@@ -27,18 +29,34 @@ public class Medicine {
         return stock;
     }
 
-    public void setStock(int stock) {
-        this.stock = stock;
-        updateMedicineInCSV();
-    }
 
     public int getLowStockAlertLevel() {
         return lowStockAlertLevel;
     }
+    public boolean getReplenishmentRequest() {
+        return replenishmentRequest;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+        checkAndSetReplenishmentRequest();
+        updateMedicineInCSV();
+    }
 
     public void setLowStockAlertLevel(int lowStockAlertLevel) {
         this.lowStockAlertLevel = lowStockAlertLevel;
+        checkAndSetReplenishmentRequest();
         updateMedicineInCSV();
+    }//should delete
+
+    public void setReplenishmentRequest(boolean replenishmentRequest) {
+        this.replenishmentRequest = replenishmentRequest;
+        updateMedicineInCSV();
+    }
+
+    // Check if stock is below lowStockAlertLevel and update replenishmentRequest
+    public void checkAndSetReplenishmentRequest() {
+        setReplenishmentRequest(this.stock < this.lowStockAlertLevel);
     }
 
     // Load medicines from CSV
@@ -51,13 +69,16 @@ public class Medicine {
 
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",", -1);
-                if (data.length < 3) {
+                if (data.length < 4) {
                     continue; // Skip invalid rows
                 }
                 String name = data[0].trim();
                 int stock = Integer.parseInt(data[1].trim());
                 int lowStockAlertLevel = Integer.parseInt(data[2].trim());
-                medicines.add(new Medicine(name, stock, lowStockAlertLevel));
+                boolean replenishmentRequest = Boolean.parseBoolean(data[3].trim());
+                Medicine medicine = new Medicine(name, stock, lowStockAlertLevel);
+                medicine.setReplenishmentRequest(replenishmentRequest);
+                medicines.add(medicine);
             }
             System.out.println("Medicine data loaded successfully.");
         } catch (IOException e) {
@@ -70,7 +91,7 @@ public class Medicine {
     public static void saveMedicinesToCSV(List<Medicine> medicines) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(MEDICINE_FILE_PATH))) {
             // Write header
-            bw.write("Medicine Name,Initial Stock,Low Stock Level Alert");
+            bw.write("Medicine Name,Initial Stock,Low Stock Level Alert,Replenishment Request");
             bw.newLine();
             // Write data
             for (Medicine medicine : medicines) {
@@ -97,7 +118,7 @@ public class Medicine {
 
     // Convert to CSV format
     public String toCSV() {
-        return name + "," + stock + "," + lowStockAlertLevel;
+        return name + "," + stock + "," + lowStockAlertLevel + "," + replenishmentRequest;
     }
 
     @Override
@@ -106,6 +127,7 @@ public class Medicine {
                 "name='" + name + '\'' +
                 ", stock=" + stock +
                 ", lowStockAlertLevel=" + lowStockAlertLevel +
+                ", replenishmentRequest=" + replenishmentRequest +
                 '}';
     }
 }

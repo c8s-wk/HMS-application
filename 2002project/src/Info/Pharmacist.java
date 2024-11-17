@@ -72,19 +72,12 @@ public class Pharmacist extends User {
 
 
     // Submit Replenishment Request
-    public void submitReplenishmentRequest(String medicineName, int additionalStock) {
+    public void submitReplenishmentRequest() {
         List<Medicine> medicines = Medicine.loadMedicinesFromCSV();
         for (Medicine medicine : medicines) {
-            if (medicine.getName().equalsIgnoreCase(medicineName)) {
-                // For demonstration, we'll directly update the stock
-                int newStock = medicine.getStock() + additionalStock;
-                medicine.setStock(newStock);
-                Medicine.saveMedicinesToCSV(medicines);
-                System.out.println("Replenishment processed for " + additionalStock + " units of " + medicineName);
-                return;
-            }
+            medicine.checkAndSetReplenishmentRequest();
         }
-        System.out.println("Medicine not found in inventory: " + medicineName);
+        System.out.println("Submit Replenishment Request Successfully");
     }
 
 

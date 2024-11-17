@@ -41,7 +41,7 @@ public class PharmacistMenu {
                 System.out.print("Enter Additional Stock: ");
                 int additionalStock = scanner.nextInt();
                 scanner.nextLine(); // Consume newline
-                pharmacist.submitReplenishmentRequest(medicineName, additionalStock);
+                pharmacist.submitReplenishmentRequest();
             }
             case 5 -> {
                 System.out.println("Logging out..." );
