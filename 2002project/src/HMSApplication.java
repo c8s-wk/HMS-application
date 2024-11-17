@@ -184,7 +184,7 @@ public class HMSApplication {
                 }
 
                 case "Info.Doctor" -> {
-                    
+
                     DoctorMenu.displayMenu();
                     int doctorChoice = scanner.nextInt();
                     scanner.nextLine(); // Consume newline

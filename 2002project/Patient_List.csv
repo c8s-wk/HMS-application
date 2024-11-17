@@ -1,4 +1,4 @@
 Patient ID,Name,Date of Birth,Gender,Blood Type,Email Address, Contact Number, Past Diagnoses, Past Treatments, Prescriptions
-P1001,Alice Brown,1980-05-14,Female,A+,9,1234 5678,,,,
+P1001,Alice Brown,1980-05-14,Female,A+,alice.brown@example.com,1234 5678,,,,
 P1002,Bob Stone,1975-11-22,Male,B+,bob.stone@example.com, 2234 5678, NA, NA, NA
 P1003,Charlie White,1990-07-08,Male,O-,charlie.white@example.com, 3334 5678, NA, NA, NA
