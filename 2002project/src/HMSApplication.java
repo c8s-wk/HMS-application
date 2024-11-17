@@ -6,6 +6,7 @@ import UserMenu.PharmacistMenu;
 import Info.Pharmacist;
 import Info.Patient;
 import Info.MedicalRecord;
+import Info.Administrator;
 
 import java.io.*;
 import java.util.*;
@@ -245,7 +246,7 @@ public class HMSApplication {
                             Integer.parseInt(staff.get("Age"))
                     );
 
-                    DoctorMenu.setDoctor(doctor,); // Pass the doctor object to DoctorMenu
+                    DoctorMenu.setDoctor(doctor,????); // Pass the doctor object to DoctorMenu
                     DoctorMenu.displayMenu(); // Show menu
 
                     int doctorChoice = scanner.nextInt();
@@ -294,12 +295,33 @@ public class HMSApplication {
             }
 
             case "Info.Administrator" -> {
-                AdministratorMenu.displayMenu();
-                int adminChoice = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
-                AdministratorMenu.handleChoice(adminChoice);
-                if (adminChoice == 9) running = false; // Logout
+                Map<String, String> staff = staffData.get(userID);
+
+                if (staff != null && "Administrator".equals(staff.get("Role"))) {
+                    // Initialize Administrator object (if a dedicated class exists)
+                    Administrator administrator = new Administrator(
+                            staff.get("ID"),
+                            "password", // Default password
+                            staff.get("Role"),
+                            staff.get("Name"),
+                            staff.get("Gender"),
+                            Integer.parseInt(staff.get("Age"))
+                    );
+
+                    AdministratorMenu.setAdministrator(administrator); // Pass Administrator object to AdministratorMenu
+                    AdministratorMenu.displayMenu(); // Show menu
+
+                    int adminChoice = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+                    AdministratorMenu.handleChoice(adminChoice);
+
+                    if (adminChoice == 9) running = false; // Logout
+                } else {
+                    System.out.println("Error: Administrator data not found.");
+                    running = false; // Stop running
+                }
             }
+
         }
     }
 }
