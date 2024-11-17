@@ -225,7 +225,6 @@ public class HMSApplication {
                 }
 
                 case "Info.Administrator" -> {
-                    // Initialize Administrator object
                     Map<String, String> adminData = staffData.get(userID);
                     if (adminData != null) {
                         String name = adminData.get("Name");
@@ -233,22 +232,37 @@ public class HMSApplication {
                         int age = Integer.parseInt(adminData.get("Age"));
                         String role = adminData.get("Role");
 
-                        // Create Administrator object with the updated constructor
                         Administrator admin = new Administrator(userID, "password", role, name, gender, age);
-                        AdministratorMenu.setAdministrator(admin); // Pass the Administrator object to the menu
+                        AdministratorMenu.setAdministrator(admin);
 
                         boolean adminRunning = true;
                         while (adminRunning) {
                             AdministratorMenu.displayMenu();
                             int adminChoice = scanner.nextInt();
                             scanner.nextLine(); // Consume newline
-                            AdministratorMenu.handleChoice(adminChoice);
-                            if (adminChoice == 5) adminRunning = false; // Logout
+
+                            //System.out.println("[DEBUG] Before handleChoice: adminRunning = " + adminRunning); // Debug
+                            adminRunning = AdministratorMenu.handleChoice(adminChoice);
+                            //System.out.println("[DEBUG] After handleChoice: adminRunning = " + adminRunning); // Debug
+
+                            if (!adminRunning) {
+                                //System.out.println("[DEBUG] Exiting administrator menu and returning to login...");
+                                break; // Exit the while loop
+                            }
                         }
                     } else {
                         System.out.println("Administrator data not found.");
                     }
+                    // Ensure returning to login occurs here
+                    return; // Break out of the current userRole handling case
                 }
+
+
+
+
+
+
+
 
 
                 default -> {

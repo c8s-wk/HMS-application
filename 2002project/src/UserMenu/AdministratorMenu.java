@@ -28,18 +28,29 @@ public class AdministratorMenu {
         System.out.print("Please enter your choice: ");
     }
 
-    public static void handleChoice(int choice) {
+    public static boolean handleChoice(int choice) {
+        //System.out.println("[DEBUG] Entering handleChoice with choice = " + choice); // Debug line
         Scanner scanner = new Scanner(System.in);
 
         switch (choice) {
-            case 1 -> manageStaff(scanner);
-            case 2 -> viewAppointments();
-            case 3 -> manageInventory(scanner);
-            case 4 -> approveReplenishmentRequest(scanner);
-            case 5 -> System.out.println("Logging out...");
+            case 1 -> System.out.println("Managing Hospital Staff...");
+            case 2 -> System.out.println("Viewing Appointments...");
+            case 3 -> System.out.println("Managing Inventory...");
+            case 4 -> System.out.println("Approving Replenishment Requests...");
+            case 5 -> {
+                System.out.println("Logging out...");
+                //System.out.println("[DEBUG] Exiting handleChoice with return = false"); // Debug line
+                return false; // Logout
+            }
             default -> System.out.println("Invalid choice. Please try again.");
         }
+
+        //System.out.println("[DEBUG] Exiting handleChoice with return = true"); // Debug line
+        return true; // Continue running
     }
+
+
+
 
     private static void manageStaff(Scanner scanner) {
         System.out.println("\n--- Manage Hospital Staff ---");
