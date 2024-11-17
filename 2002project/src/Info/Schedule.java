@@ -98,4 +98,14 @@ public class Schedule {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "DoctorID: " + doctorID +
+                ", Date: " + date +
+                ", Time: " + time +
+                ", Status: " + status +
+                ", PatientID: " + (patientID == null ? "N/A" : patientID);
+    }
+
 }

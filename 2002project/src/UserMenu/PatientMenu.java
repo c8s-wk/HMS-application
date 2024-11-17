@@ -62,6 +62,13 @@ public class PatientMenu {
 
     private static void viewAvailableSlots() {
         List<Schedule> schedules = Schedule.loadSchedulesFromCSV();
+        //Debug code
+        /*System.out.println("\n--- All Schedules Loaded ---");
+        for (Schedule schedule : schedules) {
+            System.out.println(schedule);
+        } */
+
+
         System.out.println("\n--- Available Appointment Slots ---");
         boolean slotsFound = false;
 
