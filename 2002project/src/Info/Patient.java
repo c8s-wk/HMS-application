@@ -74,7 +74,7 @@ public class Patient extends User {
         return false;
     }
 
-    public boolean rescheduleAppointment(String appointmentID, String newDate, String newTime) {
+    public boolean rescheduleAppointment(String appointmentID, String newDoctorID, String newDate, String newTime) {
         Appointment appointment = appointments.stream()
                 .filter(a -> a.getAppointmentID().equals(appointmentID))
                 .findFirst()
@@ -85,7 +85,8 @@ public class Patient extends User {
         List<Schedule> schedules = Schedule.loadSchedulesFromCSV();
 
         if (Schedule.releaseSlot(schedules, appointment.getDoctorID(), appointment.getDate(), appointment.getTime()) &&
-                Schedule.bookSlot(schedules, appointment.getDoctorID(), newDate, newTime, getUserID())) {
+                Schedule.bookSlot(schedules, newDoctorID, newDate, newTime, getUserID())) {
+            appointment.setDoctorID(newDoctorID);
             appointment.setDate(newDate);
             appointment.setTime(newTime);
             Appointment.saveAppointmentsToCSV(Appointment.loadAppointmentsFromCSV());
@@ -101,7 +102,11 @@ public class Patient extends User {
                 .findFirst()
                 .orElse(null);
 
+
         if (appointment == null) return false;
+        else{
+            appointment.cancelAnAppointment(appointmentID);
+        }
 
         List<Schedule> schedules = Schedule.loadSchedulesFromCSV();
 
@@ -115,13 +120,14 @@ public class Patient extends User {
     }
 
     public List<Appointment> getAppointments() {
-        List<Appointment> approvedAppointments = new ArrayList<>();
+        List<Appointment> findAppointments = new ArrayList<>();
         for (Appointment appointment : appointments) {
-            if (appointment.getPatientID().equals(getUserID()) && "Approved".equalsIgnoreCase(appointment.getStatus())) {
-                approvedAppointments.add(appointment);
+            if (appointment.getPatientID().equals(getUserID())) {
+                findAppointments.add(appointment);
             }
+            //System.out.println("debug");
         }
-        return approvedAppointments;
+        return findAppointments;
     }
 
 

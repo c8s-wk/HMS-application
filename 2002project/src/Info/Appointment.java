@@ -64,6 +64,8 @@ public class Appointment {
         updateAppointmentInCSV();
     }
 
+    public void setDoctorID(String doctorID) {this.doctorID = doctorID;}
+
     // Generate a unique Appointment ID
     public static String generateAppointmentID() {
         List<Appointment> appointments = loadAppointmentsFromCSV();
@@ -149,7 +151,7 @@ public class Appointment {
     }
 
     // Cancel an appointment
-    public static boolean cancelAppointment(String appointmentID) {
+    public static boolean cancelAnAppointment(String appointmentID) {
         List<Appointment> appointments = loadAppointmentsFromCSV();
         for (Appointment appointment : appointments) {
             if (appointment.getAppointmentID().equals(appointmentID)) {

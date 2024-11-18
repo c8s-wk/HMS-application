@@ -131,12 +131,14 @@ public class PatientMenu {
     private static void rescheduleAppointment(Scanner scanner) {
         System.out.print("Enter appointment ID: ");
         String appointmentID = scanner.nextLine();
+        System.out.print("Enter new DoctorID: ");
+        String newDoctorID = scanner.nextLine();
         System.out.print("Enter new appointment date (YYYY-MM-DD): ");
         String newDate = scanner.nextLine();
         System.out.print("Enter new appointment time (HH:MM): ");
         String newTime = scanner.nextLine();
 
-        if (currentPatient.rescheduleAppointment(appointmentID, newDate, newTime)) {
+        if (currentPatient.rescheduleAppointment(appointmentID, newDoctorID, newDate, newTime)) {
             System.out.println("Appointment rescheduled successfully.");
         } else {
             System.out.println("Failed to reschedule appointment.");
@@ -163,20 +165,20 @@ public class PatientMenu {
         if (appointments.isEmpty()) {
             System.out.println("No scheduled appointments.");
         } else {
-            System.out.println("Approved Appointments:");
-            boolean hasApprovedAppointments = false;
+            System.out.println("Scheduled Appointments:");
+            //boolean hasApprovedAppointments = false;
 
             // Display only approved appointments
             for (Appointment appointment : appointments) {
-                if ("Approved".equalsIgnoreCase(appointment.getStatus())) {
+                //if ("Approved".equalsIgnoreCase(appointment.getStatus())) {
                     System.out.println(appointment);
-                    hasApprovedAppointments = true;
-                }
+                   // hasApprovedAppointments = true;
+                //}
             }
 
-            if (!hasApprovedAppointments) {
-                System.out.println("No approved appointments found.");
-            }
+            //if (!hasApprovedAppointments) {
+                //System.out.println("No approved appointments found.");
+            //}
         }
     }
 
