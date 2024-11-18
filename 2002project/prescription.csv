@@ -1,2 +1,3 @@
 PrescriptionID,AppointmentID,PatientID,DoctorID,MedicationName,Status
 P1731936016010,A3,P1001,D001,Paracetamol,dispensed
+P1731936827787,A4,Unknown,Unknown,Ibuprofen,dispensed

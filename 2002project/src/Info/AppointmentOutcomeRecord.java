@@ -9,8 +9,8 @@ public class AppointmentOutcomeRecord {
     private String appointmentID;
     private String dateOfAppointment;
     private String typeOfService;
-    private List<Prescription> prescribedMedications;
     private String consultationNotes;
+    private List<Prescription> prescribedMedications;
 
     private static final String APPOINTMENT_OUTCOME_FILE_PATH = "2002project/Appointment_outcome.csv";
 
@@ -44,16 +44,15 @@ public class AppointmentOutcomeRecord {
         return prescribedMedications;
     }
 
-    // Add prescription
-    public void addPrescription(String prescriptionID, String patientID, String doctorID, String medicineName, String status) {
-        prescribedMedications.add(new Prescription(prescriptionID, appointmentID, patientID, doctorID, medicineName, status));
+    // Add a prescription to the record
+    public void addPrescription(Prescription prescription) {
+        prescribedMedications.add(prescription);
     }
 
     // Add a prescription from predefined medicine choices
     public void addPrescriptionFromChoices(String patientID, String doctorID) {
         Scanner scanner = new Scanner(System.in);
 
-        // Medicine options
         System.out.println("Select a medicine to prescribe:");
         System.out.println("1. Paracetamol");
         System.out.println("2. Ibuprofen");
@@ -69,22 +68,13 @@ public class AppointmentOutcomeRecord {
             case 3 -> selectedMedicine = "Amoxicillin";
             default -> {
                 System.out.println("Invalid choice. No medicine prescribed.");
-                selectedMedicine = null;
+                return;
             }
         }
 
-        if (selectedMedicine != null) {
-            addPrescription(
-                    "P" + System.currentTimeMillis(), // Unique prescription ID
-                    patientID,
-                    doctorID,
-                    selectedMedicine,
-                    "Pending" // Default status
-            );
-            System.out.println("Prescription added: " + selectedMedicine);
-        } else {
-            System.out.println("No valid medicine was prescribed.");
-        }
+        String prescriptionID = "P" + System.currentTimeMillis(); // Unique ID
+        addPrescription(new Prescription(prescriptionID, appointmentID, patientID, doctorID, selectedMedicine, "Pending"));
+        System.out.println("Prescription added: " + selectedMedicine);
     }
 
     // View appointment outcome details
@@ -107,25 +97,6 @@ public class AppointmentOutcomeRecord {
         System.out.println("=======================================");
     }
 
-    // Dispense all prescriptions
-    public void dispensePrescriptions() {
-        if (prescribedMedications.isEmpty()) {
-            System.out.println("No prescriptions to dispense for Appointment ID: " + appointmentID);
-            return;
-        }
-
-        System.out.println("Dispensing prescriptions for Appointment ID: " + appointmentID + "...");
-        for (Prescription prescription : prescribedMedications) {
-            if (!prescription.getStatus().equalsIgnoreCase("dispensed")) {
-                prescription.setStatus("dispensed");
-                System.out.println("Dispensed: " + prescription.getMedicineName());
-            } else {
-                System.out.println("Already dispensed: " + prescription.getMedicineName());
-            }
-        }
-        System.out.println("All prescriptions have been processed.");
-    }
-
     // Convert to CSV format
     public String toCSV() {
         StringBuilder csv = new StringBuilder();
@@ -134,22 +105,17 @@ public class AppointmentOutcomeRecord {
                 .append(typeOfService).append(",")
                 .append(consultationNotes).append(",");
 
-        if (prescribedMedications.isEmpty()) {
-            csv.append("");
-        } else {
+        if (!prescribedMedications.isEmpty()) {
             for (int i = 0; i < prescribedMedications.size(); i++) {
                 Prescription prescription = prescribedMedications.get(i);
-                csv.append(prescription.getPrescriptionID())
-                        .append(":")
-                        .append(prescription.getMedicineName())
-                        .append(":")
+                csv.append(prescription.getPrescriptionID()).append(":")
+                        .append(prescription.getMedicineName()).append(":")
                         .append(prescription.getStatus());
                 if (i < prescribedMedications.size() - 1) {
-                    csv.append(";"); // Separate multiple prescriptions with a semicolon
+                    csv.append(";"); // Separate multiple prescriptions
                 }
             }
         }
-
         return csv.toString();
     }
 
@@ -159,7 +125,6 @@ public class AppointmentOutcomeRecord {
         try (BufferedReader br = new BufferedReader(new FileReader(APPOINTMENT_OUTCOME_FILE_PATH))) {
             String line;
             br.readLine(); // Skip header
-
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",", -1);
                 if (data.length < 4) continue;
@@ -174,12 +139,12 @@ public class AppointmentOutcomeRecord {
                 if (data.length > 4 && !data[4].isEmpty()) {
                     String[] prescriptions = data[4].split(";");
                     for (String prescriptionData : prescriptions) {
-                        String[] parts = prescriptionData.split(":", 3);
+                        String[] parts = prescriptionData.split(":");
                         if (parts.length == 3) {
                             String prescriptionID = parts[0].trim();
                             String medicineName = parts[1].trim();
                             String status = parts[2].trim();
-                            record.addPrescription(prescriptionID, "somePatientID", "someDoctorID", medicineName, status);
+                            record.addPrescription(new Prescription(prescriptionID, appointmentID, "Unknown", "Unknown", medicineName, status));
                         }
                     }
                 }
@@ -187,7 +152,7 @@ public class AppointmentOutcomeRecord {
                 records.add(record);
             }
         } catch (IOException e) {
-            System.err.println("Error reading appointment outcomes CSV: " + e.getMessage());
+            System.err.println("Error reading Appointment_outcome.csv: " + e.getMessage());
         }
         return records;
     }
@@ -202,13 +167,27 @@ public class AppointmentOutcomeRecord {
                 bw.newLine();
             }
         } catch (IOException e) {
-            System.err.println("Error writing appointment outcomes CSV: " + e.getMessage());
+            System.err.println("Error writing Appointment_outcome.csv: " + e.getMessage());
         }
     }
 
-    public void addPrescription(Prescription prescription) {
-    }
-
+    // Save or update the current record to CSV
     public void saveOutcomeToCSV() {
+        List<AppointmentOutcomeRecord> records = loadAppointmentOutcomesFromCSV();
+        boolean found = false;
+
+        for (int i = 0; i < records.size(); i++) {
+            if (records.get(i).getAppointmentID().equals(appointmentID)) {
+                records.set(i, this);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            records.add(this);
+        }
+
+        saveAppointmentOutcomesToCSV(records);
     }
 }
