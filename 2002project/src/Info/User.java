@@ -1,6 +1,6 @@
 package Info;
 
-public class User {
+public abstract class User {
     protected String userID;
     protected String password;
     protected String role;
@@ -22,7 +22,7 @@ public class User {
         return role;
     }
 
-    // Getter for password (this is the method you are missing)
+    // Getter for password
     public String getPassword() {
         return password;
     }
@@ -50,6 +50,13 @@ public class User {
         }
         return false;
     }
+
+    // Abstract methods to be implemented by subclasses
+    public abstract String getName();
+
+    public abstract String getGender();
+
+    public abstract int getAge();
 
     // Display user information
     public void displayUserInfo() {

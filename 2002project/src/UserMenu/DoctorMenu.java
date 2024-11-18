@@ -140,10 +140,11 @@ public class DoctorMenu {
 
     private static void acceptOrDeclineAppointments(Scanner scanner) {
         System.out.println("\n--- Appointment Requests ---");
+        currentDoctor.loadAppointmentsFromCSV(); // Reload appointments
         boolean hasRequests = false;
 
         for (Appointment appointment : currentDoctor.getAppointments()) {
-            if (appointment.getStatus().equals("Pending")) {
+            if (appointment.getStatus().equalsIgnoreCase("Pending")) {
                 System.out.println(appointment);
                 hasRequests = true;
 
@@ -164,6 +165,8 @@ public class DoctorMenu {
         if (!hasRequests) {
             System.out.println("No pending appointment requests.");
         }
+
+        Doctor.saveAppointmentsToCSV(currentDoctor.getAppointments()); // Save updated appointments
     }
 
     private static void viewUpcomingAppointments() {

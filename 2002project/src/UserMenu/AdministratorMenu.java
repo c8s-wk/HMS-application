@@ -7,9 +7,11 @@ import Info.User;
 import Info.Doctor;
 import Info.Pharmacist;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
-
 public class AdministratorMenu {
 
     private static Administrator admin;
@@ -28,37 +30,27 @@ public class AdministratorMenu {
         System.out.print("Please enter your choice: ");
     }
 
-    public static boolean handleChoice(int choice) {
-        //System.out.println("[DEBUG] Entering handleChoice with choice = " + choice); // Debug line
+    public static void handleMenu() {
         Scanner scanner = new Scanner(System.in);
+        boolean running = true;
 
-        switch (choice) {
-            case 1 -> {
-                System.out.println("Managing Hospital Staff...");
-                manageStaff(scanner);
+        while (running) {
+            displayMenu();
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline character
+
+            switch (choice) {
+                case 1 -> manageStaff(scanner);
+                case 2 -> viewAppointments();
+                case 3 -> manageInventory(scanner);
+                case 4 -> approveReplenishmentRequest(scanner);
+                case 5 -> {
+                    System.out.println("Logging out...");
+                    running = false; // Exit the menu loop
+                }
+                default -> System.out.println("Invalid choice. Please try again.");
             }
-            case 2 -> {
-                System.out.println("Viewing Appointments...");
-                viewAppointments();
-            }
-            case 3 -> {
-                System.out.println("Managing Inventory...");
-                manageInventory(scanner);
-            }
-            case 4 -> {
-                System.out.println("Approving Replenishment Requests...");
-                approveReplenishmentRequest(scanner);
-            }
-            case 5 -> {
-                System.out.println("Logging out...");
-                //System.out.println("[DEBUG] Exiting handleChoice with return = false"); // Debug line
-                return false; // Logout
-            }
-            default -> System.out.println("Invalid choice. Please try again.");
         }
-
-        //System.out.println("[DEBUG] Exiting handleChoice with return = true"); // Debug line
-        return true; // Continue running
     }
 
 
@@ -103,8 +95,8 @@ public class AdministratorMenu {
         User newStaff;
         switch (role.toLowerCase()) {
             case "doctor" -> newStaff = new Doctor(staffID, "password", name, role, gender, age);
-            case "pharmacist" -> newStaff = new Pharmacist(staffID, "password", name, role, gender,age);
-            case "administrator" -> newStaff = new Administrator(staffID, "password",name, role, gender, age);
+            case "pharmacist" -> newStaff = new Pharmacist(staffID, "password", name, role, gender, age);
+            case "administrator" -> newStaff = new Administrator(staffID, "password", name, role, gender, age);
             default -> {
                 System.out.println("Invalid role specified.");
                 return;
@@ -113,8 +105,13 @@ public class AdministratorMenu {
 
         List<User> staffList = admin.viewStaff();
         admin.addStaff(staffList, newStaff);
+
+        //admin.updateStaffCSV(newStaff);
+        //admin.updatePasswordCSV(staffID, "password");
+
         System.out.println("Staff member added successfully.");
     }
+
 
     private static void removeStaff(Scanner scanner) {
         System.out.print("Enter Staff ID to remove: ");
@@ -123,6 +120,8 @@ public class AdministratorMenu {
         List<User> staffList = admin.viewStaff();
         admin.removeStaff(staffList, staffID);
     }
+
+
 
     private static void viewAppointments() {
         System.out.println("Currently testing/debugging.");

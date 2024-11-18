@@ -17,8 +17,23 @@ public class Pharmacist extends User {
     }
 
     // Getter for Name
+    //public String getName() {
+        //return this.name;
+    //}
+
+    @Override
     public String getName() {
-        return this.name;
+        return name;
+    }
+
+    @Override
+    public String getGender() {
+        return gender;
+    }
+
+    @Override
+    public int getAge() {
+        return age;
     }
 
     // View Appointment Outcome Records (Prescriptions)

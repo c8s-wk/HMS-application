@@ -156,15 +156,30 @@ public class PatientMenu {
 
     private static void viewScheduledAppointments() {
         System.out.println("\n--- Scheduled Appointments ---");
+
+        // Retrieve the list of appointments
         List<Appointment> appointments = currentPatient.getAppointments();
+
         if (appointments.isEmpty()) {
             System.out.println("No scheduled appointments.");
         } else {
+            System.out.println("Approved Appointments:");
+            boolean hasApprovedAppointments = false;
+
+            // Display only approved appointments
             for (Appointment appointment : appointments) {
-                System.out.println(appointment);
+                if ("Approved".equalsIgnoreCase(appointment.getStatus())) {
+                    System.out.println(appointment);
+                    hasApprovedAppointments = true;
+                }
+            }
+
+            if (!hasApprovedAppointments) {
+                System.out.println("No approved appointments found.");
             }
         }
     }
+
 
     private static void viewPastAppointmentRecords() {
         if (currentPatient != null) {
