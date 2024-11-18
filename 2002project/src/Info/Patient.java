@@ -142,6 +142,24 @@ public class Patient extends User {
                 appointments.add(appointment);
             }
         }
+        /*class PatientRecord {
+            private String patientID;
+            private String name;
+            private String PastDiagnosis;
+            private String pastTreatment;
+            private String pastPrescription;
+
+
+            public void updateDiagnosis(String newPastDiagnosis) {
+                if (newPastDiagnosis != null && newPastDiagnosis.trim().length() > 0) {
+                    if (pastDiagnoses.isEmpty()) {
+                        pastDiagnoses += "," + newPastDiagnosis;
+                    } else {
+                        pastDiagnoses.add += newPastDiagnosis;
+                    }
+                }
+            }
+        }*/
         //System.out.println("Appointments for patient " + getUserID() + ": " + appointments); // Debug: Print filtered list
     }
 
