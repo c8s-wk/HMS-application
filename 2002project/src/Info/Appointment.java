@@ -99,12 +99,23 @@ public class Appointment {
             bw.write("AppointmentID,PatientID,DoctorID,Date,Time,Status");
             bw.newLine();
             for (Appointment appointment : appointments) {
-                bw.write(appointment.toCSV());
-                bw.newLine();
+                if (appointment.isValid()) {
+                    bw.write(appointment.toCSV());
+                    bw.newLine();
+                } else {
+                    System.err.println("Invalid appointment data, skipping: " + appointment);
+                }
             }
         } catch (IOException e) {
             System.err.println("Error saving appointments: " + e.getMessage());
         }
+    }
+
+    private boolean isValid() {
+        return patientID != null && !patientID.isEmpty() &&
+                doctorID != null && !doctorID.isEmpty() &&
+                date != null && !date.isEmpty() &&
+                time != null && !time.isEmpty();
     }
 
     // Update appointment in CSV

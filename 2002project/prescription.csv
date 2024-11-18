@@ -1,3 +1,12 @@
 PrescriptionID,AppointmentID,PatientID,DoctorID,MedicationName,Status
 P1731936016010,A3,P1001,D001,Paracetamol,dispensed
 P1731936827787,A4,Unknown,Unknown,Ibuprofen,dispensed
+P1731938915233,A4,P1001,D001,Amoxicillin,Pending
+P1731940253538,A5,Unknown,Unknown,Paracetamol,dispensed
+P1731940708643,A6,Unknown,Unknown,Amoxicillin,dispensed
+P1731941697923,A7,Unknown,Unknown,Paracetamol,dispensed
+P1731942407153,A8,P1001,D001,Amoxicillin,dispensed
+P1731942714135,A9,P1001,D001,Ibuprofen,dispensed
+P1731943396702,A10,Unknown,Unknown,Paracetamol,dispensed
+P1731943593534,A11,P1001,D002,Ibuprofen,dispensed
+P1731944290020,A12,P1002,D002,Ibuprofen,dispensed

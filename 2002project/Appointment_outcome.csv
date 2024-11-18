@@ -2,3 +2,12 @@ AppointmentID,DateOfAppointment,TypeOfService,ConsultationNotes,PrescribedMedica
 A2,2024-11-30,Consultation,eat medicine,P1731934494787:Paracetamol:Pending
 A3,2024-12-20,consultation,get a cold,
 A4,2024-12-20,consultation,get aaaa cold,P1731936827787:Ibuprofen:dispensed
+A4,2024-12-20,x ray,good rib,P1731938915233:Amoxicillin:Pending
+A5,2024-12-23,x ray,cough,P1731940253538:Paracetamol:dispensed
+A6,2023-12-12,x ray,cough,P1731940708643:Amoxicillin:dispensed
+A7,2023-12-20,consultation,cough,P1731941697923:Paracetamol:dispensed
+A8,2024-02-03,x ray,chest problem,P1731942407153:Amoxicillin:dispensed
+A9,2024-12-10,x ray,bad chest,P1731942714135:Ibuprofen:dispensed
+A10,2024-12-14,Consultation,blocked nose,P1731943396702:Paracetamol:dispensed
+A11,2023-12-20,x ray,look chest,P1731943593534:Ibuprofen:dispensed
+A12,2023-12-12,chest check,problem,P1731944290020:Ibuprofen:dispensed

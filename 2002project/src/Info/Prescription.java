@@ -2,7 +2,9 @@ package Info;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Prescription {
     private String prescriptionID;
@@ -12,7 +14,8 @@ public class Prescription {
     private String medicineName;
     private String status;
 
-    private static final String PRESCRIPTION_FILE_PATH = "2002project/prescription.csv"; // The CSV file path
+    private static final String PRESCRIPTION_FILE_PATH = "2002project/prescription.csv";
+    private static final String APPOINTMENT_FILE_PATH = "2002project/appointment.csv";
 
     // Constructor
     public Prescription(String prescriptionID, String appointmentID, String patientID, String doctorID, String medicineName, String status) {
@@ -45,11 +48,6 @@ public class Prescription {
         return medicineName;
     }
 
-    public void setMedicineName(String medicineName) {
-        this.medicineName = medicineName;
-        updatePrescriptionInCSV();
-    }
-
     public String getStatus() {
         return status;
     }
@@ -59,25 +57,57 @@ public class Prescription {
         updatePrescriptionInCSV();
     }
 
-    // Load prescriptions from CSV
+    // Load appointments to map PatientID and DoctorID
+    public static Map<String, String[]> loadAppointmentsFromCSV() {
+        Map<String, String[]> appointments = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(APPOINTMENT_FILE_PATH))) {
+            String line;
+            br.readLine(); // Skip header
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",", -1);
+                if (data.length < 6) continue;
+
+                String appointmentID = data[0].trim();
+                String patientID = data[1].trim();
+                String doctorID = data[2].trim();
+                appointments.put(appointmentID, new String[]{patientID, doctorID});
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading appointments CSV: " + e.getMessage());
+        }
+        return appointments;
+    }
+
+    // Load prescriptions from CSV and fill missing PatientID/DoctorID
     public static List<Prescription> loadPrescriptionsFromCSV() {
         List<Prescription> prescriptions = new ArrayList<>();
+        Map<String, String[]> appointments = loadAppointmentsFromCSV();
+
         try (BufferedReader br = new BufferedReader(new FileReader(PRESCRIPTION_FILE_PATH))) {
             String line;
             br.readLine(); // Skip header
 
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",", -1);
-                if (data.length < 6) {
-                    continue; // Skip invalid rows
+                if (data.length < 6) continue;
+
+                String prescriptionID = data[0].trim();
+                String appointmentID = data[1].trim();
+                String patientID = data[2].trim();
+                String doctorID = data[3].trim();
+                String medicineName = data[4].trim();
+                String status = data[5].trim();
+
+                // Fill missing PatientID and DoctorID
+                if (patientID.isEmpty() || doctorID.isEmpty()) {
+                    String[] appointmentData = appointments.getOrDefault(appointmentID, new String[]{"Unknown", "Unknown"});
+                    patientID = patientID.isEmpty() ? appointmentData[0] : patientID;
+                    doctorID = doctorID.isEmpty() ? appointmentData[1] : doctorID;
                 }
+
                 prescriptions.add(new Prescription(
-                        data[0].trim(),
-                        data[1].trim(),
-                        data[2].trim(),
-                        data[3].trim(),
-                        data[4].trim(),
-                        data[5].trim()
+                        prescriptionID, appointmentID, patientID, doctorID, medicineName, status
                 ));
             }
         } catch (IOException e) {
@@ -86,12 +116,11 @@ public class Prescription {
         return prescriptions;
     }
 
-    // Save all prescriptions to CSV
+    // Save prescriptions to CSV
     public static void savePrescriptionsToCSV(List<Prescription> prescriptions) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(PRESCRIPTION_FILE_PATH))) {
             bw.write("PrescriptionID,AppointmentID,PatientID,DoctorID,MedicationName,Status");
             bw.newLine();
-
             for (Prescription prescription : prescriptions) {
                 bw.write(prescription.toCSV());
                 bw.newLine();
@@ -105,8 +134,16 @@ public class Prescription {
     private void updatePrescriptionInCSV() {
         List<Prescription> prescriptions = loadPrescriptionsFromCSV();
         for (int i = 0; i < prescriptions.size(); i++) {
-            if (prescriptions.get(i).getPrescriptionID().equalsIgnoreCase(this.prescriptionID)) {
-                prescriptions.set(i, this);
+            if (prescriptions.get(i).getPrescriptionID().equals(this.prescriptionID)) {
+                // Preserve original PatientID and DoctorID if status is being updated
+                Prescription existingPrescription = prescriptions.get(i);
+                if (existingPrescription.getPatientID().equals("Unknown")) {
+                    existingPrescription.patientID = this.patientID;
+                }
+                if (existingPrescription.getDoctorID().equals("Unknown")) {
+                    existingPrescription.doctorID = this.doctorID;
+                }
+                existingPrescription.status = this.status;
                 break;
             }
         }
