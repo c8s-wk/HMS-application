@@ -350,6 +350,31 @@ public class Administrator extends User {
         System.out.println("Medicine stock updated successfully.");
     }
 
+    public void deleteMedicine(String medicineName) {
+    // Read the current inventory
+    List<Medicine> inventory = viewInventory();
+    boolean isDeleted = false;
+
+    // Create an iterator to remove the medicine while iterating
+    Iterator<Medicine> iterator = inventory.iterator();
+    while (iterator.hasNext()) {
+        Medicine medicine = iterator.next();
+        if (medicine.getName().equalsIgnoreCase(medicineName)) {
+            iterator.remove();
+            isDeleted = true;
+            break;
+        }
+    }
+
+    if (isDeleted) {
+        // Save the updated inventory back to the CSV file
+        saveInventory(inventory);
+        System.out.println("Medicine removed successfully.");
+    } else {
+        System.out.println("Medicine not found in the inventory.");
+    }
+}
+
     // Approve replenishment requests
     public void approveReplenishmentRequest(String medicineName, int additionalStock) {
         List<Medicine> inventory = viewInventory();

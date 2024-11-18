@@ -140,6 +140,7 @@ public class AdministratorMenu {
         System.out.println("\n--- Manage Medication Inventory ---");
         System.out.println("1. View Inventory");
         System.out.println("2. Update Stock");
+        System.out.println("3. Delete Stock");
         System.out.print("Enter your choice: ");
         int inventoryChoice = scanner.nextInt();
         scanner.nextLine();
@@ -158,6 +159,11 @@ public class AdministratorMenu {
                 int newStock = scanner.nextInt();
                 admin.updateStock(medicineName, newStock);
             }
+            case 3 -> {
+            System.out.print("Enter Medicine Name to delete: "); //Not case sensitive, ibuprofen and Ibuprofen eg.
+            String medicineName = scanner.nextLine();
+            admin.deleteMedicine(medicineName);
+        }
             default -> System.out.println("Invalid choice.");
         }
     }
