@@ -22,7 +22,17 @@ public class HMSApplication {
 
     public static void main(String[] args) {
         initializeUsers(); // Initialize patients, staff, and passwords from CSV files
-        System.out.println("Welcome to the Hospital Management System!");
+        //System.out.println("---------------- Welcome to ---------------");
+        System.out.println("╔═════════════════════════════════════════╗");
+        System.out.println("║                                         ║");
+        System.out.println("║       ██╗░░██╗███╗░░░███╗░██████╗       ║");
+        System.out.println("║       ██║░░██║████╗░████║██╔════╝       ║");
+        System.out.println("║       ███████║██╔████╔██║╚█████╗░       ║");
+        System.out.println("║       ██╔══██║██║╚██╔╝██║░╚═══██╗       ║");
+        System.out.println("║       ██║░░██║██║░╚═╝░██║██████╔╝       ║");
+        System.out.println("║       ╚═╝░░╚═╝╚═╝░░░░░╚═╝╚═════╝░       ║");
+        System.out.println("║       Hospital Management System!       ║");
+        System.out.println("╚═════════════════════════════════════════╝");
 
         // User Login/Quit loop
         while (true) {
