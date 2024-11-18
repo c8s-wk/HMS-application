@@ -82,13 +82,6 @@ public class PatientMenu {
 
     private static void viewAvailableSlots() {
         List<Schedule> schedules = Schedule.loadSchedulesFromCSV();
-        //Debug code
-        /*System.out.println("\n--- All Schedules Loaded ---");
-        for (Schedule schedule : schedules) {
-            System.out.println(schedule);
-        } */
-
-
         System.out.println("\n--- Available Appointment Slots ---");
         boolean slotsFound = false;
 
@@ -158,30 +151,16 @@ public class PatientMenu {
 
     private static void viewScheduledAppointments() {
         System.out.println("\n--- Scheduled Appointments ---");
-
-        // Retrieve the list of appointments
         List<Appointment> appointments = currentPatient.getAppointments();
 
         if (appointments.isEmpty()) {
             System.out.println("No scheduled appointments.");
         } else {
-            System.out.println("Scheduled Appointments:");
-            //boolean hasApprovedAppointments = false;
-
-            // Display only approved appointments
             for (Appointment appointment : appointments) {
-                //if ("Approved".equalsIgnoreCase(appointment.getStatus())) {
-                    System.out.println(appointment);
-                   // hasApprovedAppointments = true;
-                //}
+                System.out.println(appointment);
             }
-
-            //if (!hasApprovedAppointments) {
-                //System.out.println("No approved appointments found.");
-            //}
         }
     }
-
 
     private static void viewPastAppointmentRecords() {
         if (currentPatient != null) {
@@ -190,12 +169,15 @@ public class PatientMenu {
             // Load all appointment outcomes
             List<AppointmentOutcomeRecord> outcomeRecords = AppointmentOutcomeRecord.loadAppointmentOutcomesFromCSV();
 
-            // Filter records for the current patient
+            // Filter and display records for the current patient
             boolean recordsFound = false;
             for (AppointmentOutcomeRecord record : outcomeRecords) {
-                if (record.getAppointmentID().startsWith(currentPatient.getUserID())) {
-                    recordsFound = true;
-                    record.viewOutcomeDetails();
+                // Check if the appointment outcome corresponds to the patient's appointments
+                for (Appointment appointment : currentPatient.getAppointments()) {
+                    if (record.getAppointmentID().equals(appointment.getAppointmentID())) {
+                        record.viewOutcomeDetails();
+                        recordsFound = true;
+                    }
                 }
             }
 
