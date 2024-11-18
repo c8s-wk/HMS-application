@@ -24,14 +24,35 @@ public class HMSApplication {
         initializeUsers(); // Initialize patients, staff, and passwords from CSV files
         System.out.println("Welcome to the Hospital Management System!");
 
-        // User authentication loop
+        // User Login/Quit loop
         while (true) {
-            System.out.print("Enter your User ID: ");
+            System.out.println("\nPlease select an option:");
+            System.out.println("1. Login");
+            System.out.println("2. Quit");
+            System.out.print("Enter your choice: ");
+
+            String choice = scanner.nextLine();
+            switch (choice) {
+                case "1":
+                    handleLogin();
+                    break;
+                case "2":
+                    System.out.println("Terminating Hospital Management System.");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please select 1 or 2.");
+            }
+        }
+    }
+
+    private static void handleLogin() {
+        while (true) {
+            System.out.print("\nEnter your User ID: ");
             String userID = scanner.nextLine();
             System.out.print("Enter your password: ");
             String password = scanner.nextLine();
 
-            boolean isFirstLogin = "password".equals(password); // Check if default password is used
+            boolean isFirstLogin = "password".equals(password);
 
             if (!authenticateUser(userID, password)) {
                 System.out.println("Invalid credentials. Please try again.");
@@ -43,7 +64,7 @@ public class HMSApplication {
             if (isFirstLogin) {
                 System.out.println("It looks like this is your first login. Please change your password.");
                 changePassword(userID);
-                continue; // Restart the login process after password change
+                continue;
             }
 
             String userRole = getUserRole(userID);
@@ -52,6 +73,7 @@ public class HMSApplication {
             } else {
                 displayUserMenu(userRole, userID);
             }
+            break;
         }
     }
 
