@@ -16,6 +16,7 @@ public class Administrator extends User {
     private static final String MEDICINE_FILE = "2002project/Medicine_List.csv";
     private static final String APPOINTMENT_FILE_PATH = "2002project/Appointment.csv";
     private static final String PASSWORD_CSV = "2002project/password_List.csv";
+    private static final String REPLENISHMENT_REQUEST_FILE = "Replenishment_Requests.csv";
 
     public Administrator(String userID, String password, String name, String role, String gender, int age) {
         super(userID, password, role);
@@ -376,6 +377,75 @@ public class Administrator extends User {
 }
 
     // Approve replenishment requests
+    public void viewAndApproveReplenishmentRequests() {
+        List<String[]> requests = loadReplenishmentRequests();
+
+        if (requests.isEmpty()) {
+            System.out.println("No replenishment requests to approve.");
+            return;
+        }
+
+        // Display the pending requests
+        System.out.println("--- Pending Replenishment Requests ---");
+        for (int i = 0; i < requests.size(); i++) {
+            String[] request = requests.get(i);
+            System.out.println((i + 1) + ". Medicine: " + request[0] +
+                    ", Requested Quantity: " + request[1] +
+                    ", Pharmacist ID: " + request[2] +
+                    ", Date: " + request[3]);
+        }
+
+        // Select a request to approve
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the number of the request to approve: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        if (choice < 1 || choice > requests.size()) {
+            System.out.println("Invalid choice.");
+            return;
+        }
+
+        String[] selectedRequest = requests.get(choice - 1);
+        String medicineName = selectedRequest[0];
+        int requestedQuantity = Integer.parseInt(selectedRequest[1]);
+
+        // Approve the request
+        approveReplenishmentRequest(medicineName, requestedQuantity);
+
+        // Remove the approved request from the file
+        requests.remove(choice - 1);
+        saveReplenishmentRequests(requests);
+    }
+
+    private List<String[]> loadReplenishmentRequests() {
+        List<String[]> requests = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(REPLENISHMENT_REQUEST_FILE))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] requestDetails = line.split(",");
+                requests.add(requestDetails);
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading replenishment requests: " + e.getMessage());
+        }
+
+        return requests;
+    }
+
+    private void saveReplenishmentRequests(List<String[]> requests) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(REPLENISHMENT_REQUEST_FILE))) {
+            for (String[] request : requests) {
+                bw.write(String.join(",", request));
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Error updating replenishment request file: " + e.getMessage());
+        }
+    }
+
+
     public void approveReplenishmentRequest(String medicineName, int additionalStock) {
         List<Medicine> inventory = viewInventory();
         boolean found = false;
@@ -390,12 +460,12 @@ public class Administrator extends User {
         }
 
         if (!found) {
-            System.out.println("Medicine not found.");
+            System.out.println("Medicine not found in inventory.");
             return;
         }
 
         saveInventory(inventory);
-        System.out.println("Replenishment request approved. Stock updated.");
+        System.out.println("Replenishment request approved and stock updated for: " + medicineName);
     }
 
     // Save inventory back to the CSV file

@@ -43,7 +43,7 @@ public class AdministratorMenu {
                 case 1 -> manageStaff(scanner);
                 case 2 -> viewAppointments();
                 case 3 -> manageInventory(scanner);
-                case 4 -> approveReplenishmentRequest(scanner);
+                case 4 -> admin.viewAndApproveReplenishmentRequests();
                 case 5 -> {
                     System.out.println("Logging out...");
                     running = false; // Exit the menu loop
