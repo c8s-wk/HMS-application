@@ -203,7 +203,7 @@ public class DoctorMenu {
                 if (response.equalsIgnoreCase("yes")) {
                     appointment.setStatus("Accepted");
                     System.out.println("Appointment accepted.");
-                } else {
+                 } else {
                     appointment.setStatus("Declined");
                     currentDoctor.releaseSlot(appointment.getDate(), appointment.getTime());
                     System.out.println("Appointment declined.");
