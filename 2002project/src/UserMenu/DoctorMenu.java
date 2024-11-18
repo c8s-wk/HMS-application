@@ -8,6 +8,8 @@ import Info.Schedule;
 import Info.AppointmentOutcomeRecord;
 import Info.Prescription;
 
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -15,10 +17,83 @@ public class DoctorMenu {
 
     private static Doctor currentDoctor; // The currently logged-in doctor
     private static List<Patient> patients; // The list of patients
+    String patientFilePath = "2002project/Patient_List.csv"; // Replace with actual path
+
 
     public static void setDoctor(Doctor doctor, List<Patient> patientList) {
         currentDoctor = doctor;
         patients = patientList;
+    }
+
+    static class PatientRecord {
+        private String patientID;
+        private String name;
+        private String pastDiagnoses;  // Member variable for past diagnoses
+        private String pastTreatments;
+        private String prescriptions;
+
+        public PatientRecord(String patientID, String name, String pastDiagnoses, String pastTreatments, String prescriptions) {
+            this.patientID = patientID;
+            this.name = name;
+            this.pastDiagnoses = pastDiagnoses;
+            this.pastTreatments = pastTreatments;
+            this.prescriptions = prescriptions;
+        }
+
+        public String getPatientID() {
+            return patientID;
+        }
+
+        public void updateDiagnosis(String newPastDiagnosis) {
+            if (newPastDiagnosis != null && !newPastDiagnosis.trim().isEmpty()) {
+                if (pastDiagnoses == null || pastDiagnoses.trim().isEmpty()) {
+                    pastDiagnoses = newPastDiagnosis;  // Initialize if empty
+                } else {
+                    pastDiagnoses += ", " + newPastDiagnosis;  // Append if not empty
+                }
+            }
+        }
+
+        public void updateTreatment(String newTreatment) {
+            if (newTreatment != null && !newTreatment.trim().isEmpty()) {
+                if (pastTreatments == null || pastTreatments.trim().isEmpty()) {
+                    pastTreatments = newTreatment;
+                } else {
+                    pastTreatments += ", " + newTreatment;
+                }
+            }
+        }
+
+        public void updatePrescription(String newPrescription) {
+            if (newPrescription != null && !newPrescription.trim().isEmpty()) {
+                if (prescriptions == null || prescriptions.trim().isEmpty()) {
+                    prescriptions = newPrescription;
+                } else {
+                    prescriptions += ", " + newPrescription;
+                }
+            }
+        }
+
+        // Save Patients to CSV
+        public static void savePatientsToCSV(List<PatientRecord> patientRecords) {
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("Patient_List.csv"))) {
+                // Write header
+                bw.write("PatientID,Name,PastDiagnoses,PastTreatments,Prescriptions");
+                bw.newLine();
+
+                for (PatientRecord record : patientRecords) {
+                    bw.write(String.join(",",
+                            record.patientID,
+                            record.name,
+                            record.pastDiagnoses,
+                            record.pastTreatments,
+                            record.prescriptions));
+                    bw.newLine();
+                }
+            } catch (IOException e) {
+                System.err.println("Error writing Patient_List.csv: " + e.getMessage());
+            }
+        }
     }
 
     public static void displayMenu() {
@@ -192,12 +267,12 @@ public class DoctorMenu {
                     case 3 -> "Amoxicillin";
                     default -> {
                         System.out.println("Invalid choice.");
-                        yield null; // Use yield to provide a value
+                        yield null;
                     }
                 };
 
                 if (medicineName == null) {
-                    return; // Exit the current method or do something else
+                    return; // Exit the method
                 }
 
                 String prescriptionID = "P" + System.currentTimeMillis();
@@ -226,9 +301,78 @@ public class DoctorMenu {
                 System.out.println("Service Type: " + serviceType);
                 System.out.println("Consultation Notes: " + consultationNotes);
                 System.out.println("Prescription added: " + medicineName);
+
+                updatePatientRecord(appointment.getPatientID(), serviceType, "Treatment Details", medicineName);
                 return;
             }
         }
         System.out.println("Appointment not found.");
     }
+
+    public static List<PatientRecord> loadPatientsFromCSV(String filePath) {
+        List<PatientRecord> patientRecords = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            br.readLine(); // Skip header
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",", -1); // Preserve empty fields
+
+                if (data.length < 5) {
+                    System.err.println("Invalid row in Patient_List.csv: " + line);
+                    continue;
+                }
+
+                String patientID = data[0].trim();
+                String name = data[1].trim();
+                String pastDiagnoses = data[2].trim();
+                String pastTreatments = data[3].trim();
+                String prescriptions = data[4].trim();
+
+                patientRecords.add(new PatientRecord(patientID, name, pastDiagnoses, pastTreatments, prescriptions));
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading Patient_List.csv: " + e.getMessage());
+        }
+
+        return patientRecords;
+    }
+
+
+    // Save Patients to CSV
+    public static void savePatientsToCSV(List<PatientRecord> patientRecords) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("Patient_List.csv"))) {
+            // Write header
+            bw.write("PatientID,Name,PastDiagnoses,PastTreatments,Prescriptions");
+            bw.newLine();
+
+            for (PatientRecord record : patientRecords) {
+                bw.write(String.join(",",
+                        record.patientID,
+                        record.name,
+                        record.pastDiagnoses,
+                        record.pastTreatments,
+                        record.prescriptions));
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Error writing Patient_List.csv: " + e.getMessage());
+        }
+    }
+
+    private static void updatePatientRecord(String patientID, String serviceType, String pastTreatment, String prescribedMedicine) {
+        String patientFilePath = "Patient_List.csv";  // Use your correct path.
+        List<PatientRecord> patientRecords = loadPatientsFromCSV(patientFilePath);
+        for (PatientRecord patientRecord : patientRecords) {
+            if (patientRecord.getPatientID().equals(patientID)) {
+                patientRecord.updateDiagnosis(serviceType);
+                patientRecord.updateTreatment(pastTreatment);
+                patientRecord.updatePrescription(prescribedMedicine);
+                break;
+            }
+        }
+        PatientRecord.savePatientsToCSV(patientRecords);
+    }
+
+
 }
