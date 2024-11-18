@@ -2,3 +2,6 @@ AppointmentID,DateOfAppointment,TypeOfService,ConsultationNotes,PrescribedMedica
 A2,2024-11-30,Consultation,eat medicine,P1731934494787:Paracetamol:Pending
 A3,2024-12-20,consultation,get a cold,
 A4,2024-12-20,consultation,get aaaa cold,P1731936827787:Ibuprofen:dispensed
+A5,2024-09-03,consultation,get a cold,P1731938503093:Paracetamol:dispensed
+A6,2024-03-09,X-ray,Got a cold,P1731941753193:Paracetamol:Pending
+A7,2024-12-25,Consultation,Catch a cold,P1731942320592:Paracetamol:dispensed
