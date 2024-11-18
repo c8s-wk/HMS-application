@@ -1,1 +1,3 @@
-AppointmentID,Date of Appointment,Type of service,Consultation Notes,Prescribed Medications
+AppointmentID,DateOfAppointment,TypeOfService,ConsultationNotes,PrescribedMedications
+A2,2024-11-30,Consultation,eat medicine,P1731934494787:Paracetamol:Pending
+A3,2024-12-20,consultation,get a cold,

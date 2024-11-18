@@ -1,1 +1,2 @@
-PrescriptionID,AppointmentID,PatientID,DoctorID,Medicine Name,Status
+PrescriptionID,AppointmentID,PatientID,DoctorID,MedicationName,Status
+P1731936016010,A3,P1001,D001,Paracetamol,dispensed

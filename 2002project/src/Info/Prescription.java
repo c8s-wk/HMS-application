@@ -45,7 +45,7 @@ public class Prescription {
         return medicineName;
     }
 
-    public void setMedicationName(String medicineName) {
+    public void setMedicineName(String medicineName) {
         this.medicineName = medicineName;
         updatePrescriptionInCSV();
     }
@@ -64,21 +64,21 @@ public class Prescription {
         List<Prescription> prescriptions = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(PRESCRIPTION_FILE_PATH))) {
             String line;
-            // Skip header
-            br.readLine();
+            br.readLine(); // Skip header
 
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",", -1);
                 if (data.length < 6) {
                     continue; // Skip invalid rows
                 }
-                String prescriptionID = data[0].trim();
-                String appointmentID = data[1].trim();
-                String patientID = data[2].trim();
-                String doctorID = data[3].trim();
-                String medicationName = data[4].trim();
-                String status = data[5].trim();
-                prescriptions.add(new Prescription(prescriptionID, appointmentID, patientID, doctorID, medicationName, status));
+                prescriptions.add(new Prescription(
+                        data[0].trim(),
+                        data[1].trim(),
+                        data[2].trim(),
+                        data[3].trim(),
+                        data[4].trim(),
+                        data[5].trim()
+                ));
             }
         } catch (IOException e) {
             System.err.println("Error reading prescriptions CSV: " + e.getMessage());
@@ -86,13 +86,12 @@ public class Prescription {
         return prescriptions;
     }
 
-    // Save prescriptions to CSV
+    // Save all prescriptions to CSV
     public static void savePrescriptionsToCSV(List<Prescription> prescriptions) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(PRESCRIPTION_FILE_PATH))) {
-            // Write header
             bw.write("PrescriptionID,AppointmentID,PatientID,DoctorID,MedicationName,Status");
             bw.newLine();
-            // Write data
+
             for (Prescription prescription : prescriptions) {
                 bw.write(prescription.toCSV());
                 bw.newLine();
@@ -102,7 +101,7 @@ public class Prescription {
         }
     }
 
-    // Update this prescription in CSV
+    // Update a specific prescription in the CSV
     private void updatePrescriptionInCSV() {
         List<Prescription> prescriptions = loadPrescriptionsFromCSV();
         for (int i = 0; i < prescriptions.size(); i++) {
@@ -114,9 +113,9 @@ public class Prescription {
         savePrescriptionsToCSV(prescriptions);
     }
 
-    // Convert to CSV format
+    // Convert Prescription object to CSV format
     public String toCSV() {
-        return prescriptionID + "," + appointmentID + "," + patientID + "," + doctorID + "," + medicineName + "," + status;
+        return String.join(",", prescriptionID, appointmentID, patientID, doctorID, medicineName, status);
     }
 
     @Override
@@ -126,11 +125,8 @@ public class Prescription {
                 ", appointmentID='" + appointmentID + '\'' +
                 ", patientID='" + patientID + '\'' +
                 ", doctorID='" + doctorID + '\'' +
-                ", medicationName='" + medicineName + '\'' +
+                ", medicineName='" + medicineName + '\'' +
                 ", status='" + status + '\'' +
                 '}';
     }
 }
-
-
-

@@ -205,4 +205,10 @@ public class AppointmentOutcomeRecord {
             System.err.println("Error writing appointment outcomes CSV: " + e.getMessage());
         }
     }
+
+    public void addPrescription(Prescription prescription) {
+    }
+
+    public void saveOutcomeToCSV() {
+    }
 }

@@ -6,6 +6,7 @@ import Info.MedicalRecord;
 import Info.Patient;
 import Info.Schedule;
 import Info.AppointmentOutcomeRecord;
+import Info.Prescription;
 
 import java.util.List;
 import java.util.Scanner;
@@ -15,7 +16,6 @@ public class DoctorMenu {
     private static Doctor currentDoctor; // The currently logged-in doctor
     private static List<Patient> patients; // The list of patients
 
-    // Method to set the current doctor and patients
     public static void setDoctor(Doctor doctor, List<Patient> patientList) {
         currentDoctor = doctor;
         patients = patientList;
@@ -33,22 +33,6 @@ public class DoctorMenu {
         System.out.println("8. Logout");
         System.out.print("Please enter your choice: ");
     }
-
-    /*public static void handleChoice(int choice) {
-        Scanner scanner = new Scanner(System.in);
-
-        switch (choice) {
-            case 1 -> viewPatientMedicalRecords();
-            case 2 -> updatePatientMedicalRecords(scanner);
-            case 3 -> currentDoctor.viewSchedule();
-            case 4 -> setAvailability(scanner);
-            case 5 -> acceptOrDeclineAppointments(scanner);
-            case 6 -> viewUpcomingAppointments();
-            case 7 -> recordAppointmentOutcome(scanner);
-            case 8 -> logout();
-            default -> System.out.println("Invalid choice. Please try again.");
-        }
-    } */
 
     public static void handleMenu() {
         Scanner scanner = new Scanner(System.in);
@@ -79,7 +63,7 @@ public class DoctorMenu {
     }
 
     private static void viewPatientMedicalRecords() {
-        System.out.println("\n--- Viewing Medical Records of Patients under Care ---");
+        System.out.println("\n--- Viewing Medical Records ---");
         for (Appointment appointment : currentDoctor.getAppointments()) {
             for (Patient patient : patients) {
                 if (patient.getUserID().equals(appointment.getPatientID())) {
@@ -107,11 +91,6 @@ public class DoctorMenu {
                 String treatment = scanner.nextLine();
                 record.addTreatment(treatment);
 
-                System.out.println("Prescriptions available: Paracetamol, Ibuprofen, Amoxicillin");
-                System.out.print("Enter new prescription: ");
-                String prescription = scanner.nextLine();
-                record.addPrescription(prescription);
-
                 System.out.println("Medical Record updated successfully!");
                 return;
             }
@@ -130,13 +109,8 @@ public class DoctorMenu {
         System.out.print("Enter the status (Available/Unavailable): ");
         String status = scanner.nextLine();
 
-        if (status.equalsIgnoreCase("Available") || status.equalsIgnoreCase("Unavailable")) {
-            currentDoctor.setAvailability(date, time, status);
-        } else {
-            System.out.println("Invalid status. Please enter 'Available' or 'Unavailable'.");
-        }
+        currentDoctor.setAvailability(date, time, status);
     }
-
 
     private static void acceptOrDeclineAppointments(Scanner scanner) {
         System.out.println("\n--- Appointment Requests ---");
@@ -197,7 +171,6 @@ public class DoctorMenu {
                 System.out.print("Enter consultation notes: ");
                 String consultationNotes = scanner.nextLine();
 
-                // Create a new AppointmentOutcomeRecord
                 AppointmentOutcomeRecord outcome = new AppointmentOutcomeRecord(
                         appointmentID,
                         appointment.getDate(),
@@ -205,29 +178,57 @@ public class DoctorMenu {
                         consultationNotes
                 );
 
-                // Add a prescription using predefined choices
-                outcome.addPrescriptionFromChoices(appointment.getPatientID(), currentDoctor.getUserID());
+                System.out.println("Select a medicine to prescribe:");
+                System.out.println("1. Paracetamol");
+                System.out.println("2. Ibuprofen");
+                System.out.println("3. Amoxicillin");
+                System.out.print("Enter your choice (1-3): ");
+                int medChoice = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
 
-                // Save the outcome to the CSV file
+                String medicineName = switch (medChoice) {
+                    case 1 -> "Paracetamol";
+                    case 2 -> "Ibuprofen";
+                    case 3 -> "Amoxicillin";
+                    default -> {
+                        System.out.println("Invalid choice.");
+                        yield null; // Use yield to provide a value
+                    }
+                };
+
+                if (medicineName == null) {
+                    return; // Exit the current method or do something else
+                }
+
+                String prescriptionID = "P" + System.currentTimeMillis();
+                Prescription prescription = new Prescription(
+                        prescriptionID,
+                        appointmentID,
+                        appointment.getPatientID(),
+                        currentDoctor.getUserID(),
+                        medicineName,
+                        "Pending"
+                );
+
+                outcome.addPrescription(prescription);
                 List<AppointmentOutcomeRecord> outcomes = AppointmentOutcomeRecord.loadAppointmentOutcomesFromCSV();
                 outcomes.add(outcome);
                 AppointmentOutcomeRecord.saveAppointmentOutcomesToCSV(outcomes);
 
-                // Update appointment status
+                List<Prescription> prescriptions = Prescription.loadPrescriptionsFromCSV();
+                prescriptions.add(prescription);
+                Prescription.savePrescriptionsToCSV(prescriptions);
+
                 appointment.setStatus("Completed");
+                Doctor.saveAppointmentsToCSV(currentDoctor.getAppointments());
+
                 System.out.println("\n--- Appointment Outcome Recorded Successfully ---");
                 System.out.println("Service Type: " + serviceType);
                 System.out.println("Consultation Notes: " + consultationNotes);
+                System.out.println("Prescription added: " + medicineName);
                 return;
             }
         }
         System.out.println("Appointment not found.");
     }
-
-
-    /*private static void logout() {
-        System.out.println("Logging out...");
-        currentDoctor = null; // Clear the context
-        patients = null;
-    } */
 }

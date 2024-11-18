@@ -1,4 +1,2 @@
 DoctorID,Date,Time,Status,PatientID
-D001,2023-11-20,12:00,Available,
-D001,2023-11-21,12:00,Available,
-D002,2023-11-20,10:00,Available,
+D001,2024-12-20,12:20,Booked,P1001
