@@ -131,7 +131,7 @@ public class Patient extends User {
 
         //System.out.println("Loaded appointments from CSV:"); // Debug print
         for (Appointment appointment : allAppointments) {
-            System.out.println(appointment); // Debug: Print all loaded appointments
+            //System.out.println(appointment); // Debug: Print all loaded appointments
             if (appointment.getPatientID().equals(getUserID())) {
                 appointments.add(appointment);
             }
