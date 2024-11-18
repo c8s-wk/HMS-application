@@ -2,3 +2,4 @@ AppointmentID,PatientID,DoctorID,Date,Time,Status
 A1,P1001,D001,2023-11-20,12:00,Cancelled
 A2,P1001,D001,2024-11-30,12:00,Completed
 A3,P1001,D001,2024-12-20,12:20,Completed
+A4,P1001,D001,2024-12-20,12:20,Completed
