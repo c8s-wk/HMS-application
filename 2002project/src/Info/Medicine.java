@@ -61,30 +61,24 @@ public class Medicine {
 
     // Load medicines from CSV
     public static List<Medicine> loadMedicinesFromCSV() {
-        List<Medicine> medicines = new ArrayList<>();
+        List<Medicine> inventory = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(MEDICINE_FILE_PATH))) {
             String line;
-            // Skip header
-            br.readLine();
-
+            br.readLine(); // Skip header
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",", -1);
-                if (data.length < 4) {
-                    continue; // Skip invalid rows
-                }
-                String name = data[0].trim();
+                if (data.length < 3) continue;
+
+                String medicineName = data[0].trim();
                 int stock = Integer.parseInt(data[1].trim());
-                int lowStockAlertLevel = Integer.parseInt(data[2].trim());
-                boolean replenishmentRequest = Boolean.parseBoolean(data[3].trim());
-                Medicine medicine = new Medicine(name, stock, lowStockAlertLevel);
-                medicine.setReplenishmentRequest(replenishmentRequest);
-                medicines.add(medicine);
+                int lowStockAlert = Integer.parseInt(data[2].trim());
+
+                inventory.add(new Medicine(medicineName, stock, lowStockAlert));
             }
-            System.out.println("Medicine data loaded successfully.");
         } catch (IOException e) {
-            System.err.println("Error reading medicine inventory CSV: " + e.getMessage());
+            System.err.println("Error reading medicine file: " + e.getMessage());
         }
-        return medicines;
+        return inventory;
     }
 
     // Save medicines to CSV
