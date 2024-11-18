@@ -9,7 +9,7 @@ public class Pharmacist extends User {
     private String gender;
     private int age;
 
-    public Pharmacist(String userID, String password, String role, String name, String gender, int age) {
+    public Pharmacist(String userID, String password, String name, String role,  String gender, int age) {
         super(userID, password, "Pharmacist");
         this.name = name;
         this.gender = gender;
