@@ -95,7 +95,8 @@ public class Doctor extends User {
     }
 
     // Load appointments for this doctor from Appointment.csv
-    private void loadAppointmentsFromCSV() {
+    public void loadAppointmentsFromCSV() {
+        appointments.clear();
         try (BufferedReader br = new BufferedReader(new FileReader(APPOINTMENT_FILE))) {
             String line;
             br.readLine(); // Skip header
@@ -155,48 +156,75 @@ public class Doctor extends User {
     public List<Appointment> getAppointments() {
         return appointments;
     }
+    // Save updated appointments to Appointment.csv
+    public void saveAppointments() {
+        saveAppointmentsToCSV(appointments);
+    }
 
-    // View the doctor's schedule
-    public void viewSchedule() {
-        System.out.println("\n--- Doctor's Schedule ---");
-        if (appointments.isEmpty()) {
-            System.out.println("No scheduled appointments.");
-        } else {
+    public static void saveAppointmentsToCSV(List<Appointment> appointments) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(APPOINTMENT_FILE))) {
+            bw.write("AppointmentID,PatientID,DoctorID,Date,Time,Status\n");
             for (Appointment appointment : appointments) {
-                System.out.println(appointment);
+                bw.write(appointment.toCSV());
+                bw.newLine();
             }
+        } catch (IOException e) {
+            System.err.println("Error saving appointments: " + e.getMessage());
         }
     }
 
+
+    // View the doctor's schedule
+    public void viewSchedule() {
+        System.out.println("\n--- Doctor's Full Schedule ---");
+        try (BufferedReader br = new BufferedReader(new FileReader(SCHEDULE_FILE))) {
+            String line = br.readLine(); // Skip header
+            boolean hasSchedule = false;
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length >= 5 && data[0].equals(getUserID())) { // Check if DoctorID matches
+                    String date = data[1].trim();
+                    String time = data[2].trim();
+                    String status = data[3].trim();
+                    String patientID = data[4].isEmpty() ? "N/A" : data[4].trim();
+
+                    System.out.println("Date: " + date + " | Time: " + time + " | Status: " + status + " | Patient ID: " + patientID);
+                    hasSchedule = true;
+                }
+            }
+
+            if (!hasSchedule) {
+                System.out.println("No schedule found for Doctor ID: " + getUserID());
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading schedule: " + e.getMessage());
+        }
+    }
+
+
     // Set availability for a specific date and time
     public void setAvailability(String date, String time, String status) {
-        boolean slotExists = false;
+        loadAvailableSlotsFromCSV();
 
-        for (Schedule schedule : availableSlots) {
-            if (schedule.getDate().equals(date) && schedule.getTime().equals(time)) {
-                if (schedule.getStatus().equalsIgnoreCase(status)) {
-                    System.out.println("The slot is already marked as " + status + ".");
-                } else {
-                    schedule.setStatus(status);
-                    schedule.setPatientID(null); // Clear patient ID if slot is being made available or unavailable
-                    Schedule.saveSchedulesToCSV(availableSlots);
-                    System.out.println("Slot updated to '" + status + "': " + date + " | " + time);
-                }
-                slotExists = true;
+        boolean slotUpdated = false;
+        for (Schedule slot : availableSlots) {
+            if (slot.getDate().equals(date) && slot.getTime().equals(time)) {
+                slot.setStatus(status);
+                slot.setPatientID(null);
+                slotUpdated = true;
                 break;
             }
         }
 
-        if (!slotExists) {
-            if (status.equalsIgnoreCase("Available") || status.equalsIgnoreCase("Unavailable")) {
-                availableSlots.add(new Schedule(getUserID(), date, time, status, null));
-                Schedule.saveSchedulesToCSV(availableSlots);
-                System.out.println("New slot added with status '" + status + "': " + date + " | " + time);
-            } else {
-                System.out.println("Invalid status. Please use 'Available' or 'Unavailable'.");
-            }
+        if (!slotUpdated) {
+            availableSlots.add(new Schedule(getUserID(), date, time, status, null));
         }
+
+        Schedule.saveSchedulesToCSV(availableSlots);
+        System.out.println("Slot updated or added: " + date + " | " + time + " | " + status);
     }
+
 
 
     // Release a booked slot

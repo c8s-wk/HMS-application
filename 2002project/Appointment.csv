@@ -1,1 +1,2 @@
 AppointmentID,PatientID,DoctorID,Date,Time,Status
+A01,P1001,D001,2023-11-20,12:00,Approved

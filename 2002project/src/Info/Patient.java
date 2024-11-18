@@ -63,7 +63,11 @@ public class Patient extends User {
         List<Schedule> schedules = Schedule.loadSchedulesFromCSV();
         if (Schedule.bookSlot(schedules, newAppointment.getDoctorID(), newAppointment.getDate(), newAppointment.getTime(), getUserID())) {
             appointments.add(newAppointment);
-            Appointment.saveAppointmentsToCSV(Appointment.loadAppointmentsFromCSV());
+
+            // Save updated appointment list and schedule
+            List<Appointment> allAppointments = Appointment.loadAppointmentsFromCSV();
+            allAppointments.add(newAppointment);
+            Appointment.saveAppointmentsToCSV(allAppointments);
             Schedule.saveSchedulesToCSV(schedules);
             return true;
         }
@@ -111,15 +115,28 @@ public class Patient extends User {
     }
 
     public List<Appointment> getAppointments() {
-        return appointments;
+        List<Appointment> approvedAppointments = new ArrayList<>();
+        for (Appointment appointment : appointments) {
+            if (appointment.getPatientID().equals(getUserID()) && "Approved".equalsIgnoreCase(appointment.getStatus())) {
+                approvedAppointments.add(appointment);
+            }
+        }
+        return approvedAppointments;
     }
 
+
     private void loadAppointments() {
+        appointments.clear(); // Clear any existing appointments
         List<Appointment> allAppointments = Appointment.loadAppointmentsFromCSV();
+
+        //System.out.println("Loaded appointments from CSV:"); // Debug print
         for (Appointment appointment : allAppointments) {
+            System.out.println(appointment); // Debug: Print all loaded appointments
             if (appointment.getPatientID().equals(getUserID())) {
                 appointments.add(appointment);
             }
         }
+        //System.out.println("Appointments for patient " + getUserID() + ": " + appointments); // Debug: Print filtered list
     }
+
 }
