@@ -141,6 +141,7 @@ public class AdministratorMenu {
         System.out.println("1. View Inventory");
         System.out.println("2. Update Stock");
         System.out.println("3. Delete Stock");
+        System.out.println("4. Change Low Stock Alert Level");
         System.out.print("Enter your choice: ");
         int inventoryChoice = scanner.nextInt();
         scanner.nextLine();
@@ -160,10 +161,17 @@ public class AdministratorMenu {
                 admin.updateStock(medicineName, newStock);
             }
             case 3 -> {
-            System.out.print("Enter Medicine Name to delete: "); //Not case sensitive, ibuprofen and Ibuprofen eg.
-            String medicineName = scanner.nextLine();
-            admin.deleteMedicine(medicineName);
-        }
+                System.out.print("Enter Medicine Name to delete: "); //Not case sensitive, ibuprofen and Ibuprofen eg.
+                String medicineName = scanner.nextLine();
+                admin.deleteMedicine(medicineName);
+            }
+            case 4 -> {
+                System.out.print("Enter Medicine Name to update low stock alert level: ");
+                String medicineName = scanner.nextLine();
+                System.out.print("Enter New Low Stock Alert Level: ");
+                int newAlertLevel = scanner.nextInt();
+                admin.changeStockAlertLevel(medicineName, newAlertLevel);
+            }
             default -> System.out.println("Invalid choice.");
         }
     }
