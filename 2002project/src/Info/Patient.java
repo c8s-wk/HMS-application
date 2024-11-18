@@ -34,6 +34,11 @@ public class Patient extends User {
         return medicalRecord.getGender();
     }
 
+    @Override
+    public int getAge() {
+        return 0;
+    }
+
     public String getBloodType() {
         return medicalRecord.getBloodType();
     }

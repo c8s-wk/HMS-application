@@ -17,7 +17,7 @@ public class Doctor extends User {
 
     private static List<Doctor> allDoctors = new ArrayList<>();
 
-    public Doctor(String userID, String password, String role, String name, String gender, int age) {
+    public Doctor(String userID, String password, String name, String role, String gender, int age) {
         super(userID, password, "Doctor");
         this.name = name;
         this.gender = gender;
@@ -33,17 +33,17 @@ public class Doctor extends User {
         return super.getUserID();
     }
 
-    // Getter for Name
+    @Override
     public String getName() {
         return name;
     }
 
-    // Getter for Gender
+    @Override
     public String getGender() {
         return gender;
     }
 
-    // Getter for Age
+    @Override
     public int getAge() {
         return age;
     }
