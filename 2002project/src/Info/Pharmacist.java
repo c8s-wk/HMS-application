@@ -93,4 +93,14 @@ public class Pharmacist extends User {
         }
         System.out.println("Submit Replenishment Request Successfully");
     }
+
+    @Override
+    public String toString() {
+        return "Pharmacist{" +
+                "userID='" + getUserID() + '\'' +
+                ", name='" + name + '\'' +
+                ", gender='" + gender + '\'' +
+                ", age=" + age +
+                '}';
+    }
 }

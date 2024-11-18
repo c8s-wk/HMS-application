@@ -26,7 +26,8 @@ public class PatientMenu {
         System.out.println("5. Reschedule an Appointment");
         System.out.println("6. Cancel an Appointment");
         System.out.println("7. View Scheduled Appointments");
-        System.out.println("8. Logout");
+        System.out.println("8. View Past Appointments Outcome Record");
+        System.out.println("9. Log out");
         System.out.print("Please enter your choice: ");
     }
 

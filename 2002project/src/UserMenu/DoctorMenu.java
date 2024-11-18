@@ -34,7 +34,7 @@ public class DoctorMenu {
         System.out.print("Please enter your choice: ");
     }
 
-    public static void handleChoice(int choice) {
+    /*public static void handleChoice(int choice) {
         Scanner scanner = new Scanner(System.in);
 
         switch (choice) {
@@ -47,6 +47,34 @@ public class DoctorMenu {
             case 7 -> recordAppointmentOutcome(scanner);
             case 8 -> logout();
             default -> System.out.println("Invalid choice. Please try again.");
+        }
+    } */
+
+    public static void handleMenu() {
+        Scanner scanner = new Scanner(System.in);
+        boolean isRunning = true;
+
+        while (isRunning) {
+            displayMenu();
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline character
+
+            switch (choice) {
+                case 1 -> viewPatientMedicalRecords();
+                case 2 -> updatePatientMedicalRecords(scanner);
+                case 3 -> currentDoctor.viewSchedule();
+                case 4 -> setAvailability(scanner);
+                case 5 -> acceptOrDeclineAppointments(scanner);
+                case 6 -> viewUpcomingAppointments();
+                case 7 -> recordAppointmentOutcome(scanner);
+                case 8 -> {
+                    System.out.println("Logging out...");
+                    currentDoctor = null; // Clear the context
+                    patients = null;
+                    isRunning = false; // Exit the menu loop
+                }
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
         }
     }
 
@@ -194,9 +222,9 @@ public class DoctorMenu {
     }
 
 
-    private static void logout() {
+    /*private static void logout() {
         System.out.println("Logging out...");
         currentDoctor = null; // Clear the context
         patients = null;
-    }
+    } */
 }

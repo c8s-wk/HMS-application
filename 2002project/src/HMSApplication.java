@@ -12,6 +12,9 @@ import Info.Administrator;
 import java.io.*;
 import java.util.*;
 
+import static Info.Doctor.getDoctorById;
+import static UserMenu.DoctorMenu.setDoctor;
+
 public class HMSApplication {
     private static List<Patient> patients = new ArrayList<>();
     private static Map<String, Map<String, String>> staffData = new HashMap<>(); // Staff data map (ID -> Details)
@@ -93,22 +96,25 @@ public class HMSApplication {
     }
 
     // Authenticate the user based on User ID and password
+    // Authenticate the user based on User ID and password
     private static boolean authenticateUser(String userID, String password) {
         // Check if the password matches the stored password
-        if (userPasswords.containsKey(userID) && userPasswords.get(userID).equals(password)) {
-            return true;
+        if (userPasswords.containsKey(userID)) {
+            // If the password is not the default and matches, authenticate
+            return userPasswords.get(userID).equals(password);
         }
 
-        // Check if the user is a patient
+        // Check if the user is a patient and their password matches
         for (Patient patient : patients) {
-            if (patient.getUserID().equals(userID) && patient.getPassword().equals(password)) {
-                return true;
+            if (patient.getUserID().equals(userID)) {
+                return patient.getPassword().equals(password);
             }
         }
 
-        // Check if the user is staff
+        // Check if the user is staff and their password matches
         return staffData.containsKey(userID) && staffData.get(userID).get("Password").equals(password);
     }
+
 
     // Initialize patients, staff, and passwords from CSV files
     private static void initializeUsers() {
@@ -119,6 +125,7 @@ public class HMSApplication {
 
     // Initialize passwords from the password_List.csv file
     private static void initializePasswordsFromCSV(String filePath) {
+        userPasswords.clear(); // Clear any existing passwords in memory
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             br.readLine(); // Skip header
@@ -227,7 +234,7 @@ public class HMSApplication {
 
         switch (role) {
             case "Info.Patient" -> {
-                PatientMenu.displayMenu();
+                //PatientMenu.displayMenu();
                 //int patientChoice = scanner.nextInt();
                 //scanner.nextLine(); // Consume newline
                 PatientMenu.handleMenu();
@@ -263,11 +270,14 @@ public class HMSApplication {
 
 
             case "Info.Doctor" -> {
-                DoctorMenu.displayMenu();
-                int doctorChoice = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
-                DoctorMenu.handleChoice(doctorChoice);
-                if (doctorChoice == 9) running = false; // Logout
+                Doctor doctor = getDoctorById(userID);
+                setDoctor(doctor, patients); // Set doctor context
+                //DoctorMenu.displayMenu();
+                //int doctorChoice = scanner.nextInt();
+                //scanner.nextLine(); // Consume the newline character
+                DoctorMenu.handleMenu();
+                //if (doctorChoice == 8) running = false; // Logout option
+                break;
             }
 
 
