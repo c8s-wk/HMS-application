@@ -3,6 +3,9 @@ package UserMenu;
 import Info.*;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -166,7 +169,7 @@ public class DoctorMenu {
         System.out.println("Patient not found.");
     }
 
-    private static void setAvailability(Scanner scanner) {
+    /*private static void setAvailability(Scanner scanner) {
         System.out.println("\n--- Set Slot Availability ---");
         boolean addingSlots = true;
 
@@ -192,7 +195,52 @@ public class DoctorMenu {
         currentDoctor.loadScheduleFromCSV(); // Ensure schedule is up-to-date
         Doctor.saveScheduleToCSV(currentDoctor.getUserID(), currentDoctor.getSchedule());
         System.out.println("Availability slots updated successfully!");
+    }*/
+
+    private static void setAvailability(Scanner scanner) {
+        System.out.println("\n--- Set Slot Availability ---");
+        boolean addingSlots = true;
+
+        while (addingSlots) {
+            try {
+                System.out.print("Enter the date (YYYY-MM-DD): ");
+                String dateInput = scanner.nextLine();
+                LocalDate date = LocalDate.parse(dateInput); // Parse and validate date
+
+                if (date.isBefore(LocalDate.now())) {
+                    System.out.println("Invalid date, please set again.");
+                    continue; // Skip rest of the loop and ask for input again
+                }
+
+                System.out.print("Enter the time (HH:MM): ");
+                String timeInput = scanner.nextLine();
+                LocalTime time = LocalTime.parse(timeInput); // Parse and validate time
+
+                System.out.print("Enter the status (Available/Unavailable): ");
+                String status = scanner.nextLine();
+
+                currentDoctor.setAvailability(dateInput, timeInput, status);
+
+                System.out.print("Do you want to add another slot? (yes/no): ");
+                String response = scanner.nextLine();
+                if (response.equalsIgnoreCase("no")) {
+                    addingSlots = false;
+                }
+
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date or time format, please try again.");
+            }
+        }
+
+        // Load and save the updated schedule
+        currentDoctor.loadScheduleFromCSV(); // Ensure schedule is up-to-date
+        Doctor.saveScheduleToCSV(currentDoctor.getUserID(), currentDoctor.getSchedule());
+        System.out.println("Availability slots updated successfully!");
     }
+
+
+
+
 
     private static void acceptOrDeclineAppointments(Scanner scanner) {
         System.out.println("\n--- Appointment Requests ---");
