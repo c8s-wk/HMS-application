@@ -11,7 +11,7 @@ public class DoctorMenu {
 
     private static Doctor currentDoctor; // The currently logged-in doctor
     private static List<Patient> patients; // The list of patients
-    String patientFilePath = "2002project/Patient_List.csv"; // Replace with actual path
+    //String patientFilePath = "2002project/Patient_List.csv"; // Replace with actual path
 
     public static void setDoctor(Doctor doctor, List<Patient> patientList) {
         currentDoctor = doctor;
