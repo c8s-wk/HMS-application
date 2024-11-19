@@ -56,7 +56,7 @@ public class Schedule {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",", -1);
-                schedules.add(new Schedule(data[0], data[1], data[2], data[3], data[4].isEmpty() ? null : data[4]));
+                schedules.add(new Schedule(data[0], data[1], data[2], data[3], data.length > 4 && !data[4].isEmpty() ? data[4] : null));
             }
         } catch (IOException e) {
             System.err.println("Error loading schedule: " + e.getMessage());
@@ -69,7 +69,7 @@ public class Schedule {
             bw.write("DoctorID,Date,Time,Status,PatientID");
             bw.newLine();
             for (Schedule schedule : schedules) {
-                bw.write(schedule.getDoctorID() + "," + schedule.getDate() + "," + schedule.getTime() + "," + schedule.getStatus() + "," + (schedule.getPatientID() == null ? "" : schedule.getPatientID()));
+                bw.write(schedule.toCSV());
                 bw.newLine();
             }
         } catch (IOException e) {
@@ -79,7 +79,10 @@ public class Schedule {
 
     public static boolean bookSlot(List<Schedule> schedules, String doctorID, String date, String time, String patientID) {
         for (Schedule schedule : schedules) {
-            if (schedule.getDoctorID().equals(doctorID) && schedule.getDate().equals(date) && schedule.getTime().equals(time) && "Available".equalsIgnoreCase(schedule.getStatus())) {
+            if (schedule.getDoctorID().equals(doctorID) &&
+                    schedule.getDate().equals(date) &&
+                    schedule.getTime().equals(time) &&
+                    "Available".equalsIgnoreCase(schedule.getStatus())) {
                 schedule.setStatus("Booked");
                 schedule.setPatientID(patientID);
                 return true;
@@ -90,13 +93,25 @@ public class Schedule {
 
     public static boolean releaseSlot(List<Schedule> schedules, String doctorID, String date, String time) {
         for (Schedule schedule : schedules) {
-            if (schedule.getDoctorID().equals(doctorID) && schedule.getDate().equals(date) && schedule.getTime().equals(time) && "Booked".equalsIgnoreCase(schedule.getStatus())) {
+            if (schedule.getDoctorID().equals(doctorID) &&
+                    schedule.getDate().equals(date) &&
+                    schedule.getTime().equals(time) &&
+                    "Booked".equalsIgnoreCase(schedule.getStatus())) {
                 schedule.setStatus("Available");
                 schedule.setPatientID(null);
                 return true;
             }
         }
         return false;
+    }
+
+    public String toCSV() {
+        return String.join(",",
+                doctorID,
+                date,
+                time,
+                status,
+                patientID == null ? "" : patientID);
     }
 
     @Override
@@ -107,5 +122,4 @@ public class Schedule {
                 ", Status: " + status +
                 ", PatientID: " + (patientID == null ? "N/A" : patientID);
     }
-
 }

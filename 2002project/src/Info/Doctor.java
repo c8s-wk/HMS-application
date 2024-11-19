@@ -25,10 +25,9 @@ public class Doctor extends User {
         this.appointments = new ArrayList<>();
         this.availableSlots = new ArrayList<>();
         loadAppointmentsFromCSV();
-        loadAvailableSlotsFromCSV();
+        loadScheduleFromCSV();
     }
 
-    // Getter for UserID (inherited from User class)
     public String getUserID() {
         return super.getUserID();
     }
@@ -48,8 +47,6 @@ public class Doctor extends User {
         return age;
     }
 
-
-    // Static method to retrieve all doctors
     public static List<Doctor> getAllDoctors() {
         if (!allDoctors.isEmpty()) {
             return allDoctors;
@@ -82,19 +79,16 @@ public class Doctor extends User {
     }
 
     public static Doctor getDoctorById(String doctorId) {
-        // Ensure the list of all doctors is loaded
         List<Doctor> allDoctors = getAllDoctors();
-
         for (Doctor doctor : allDoctors) {
             if (doctor.getUserID().equals(doctorId)) {
-                return doctor; // Found the doctor, return the object
+                return doctor;
             }
         }
         System.out.println("Doctor with ID " + doctorId + " not found.");
-        return null; // Return null if not found
+        return null;
     }
 
-    // Load appointments for this doctor from Appointment.csv
     public void loadAppointmentsFromCSV() {
         appointments.clear();
         try (BufferedReader br = new BufferedReader(new FileReader(APPOINTMENT_FILE))) {
@@ -123,40 +117,25 @@ public class Doctor extends User {
         }
     }
 
-    // Load available slots for this doctor from Schedule.csv
-    private void loadAvailableSlotsFromCSV() {
-        availableSlots.clear(); // Prevent duplicates or accumulation
-
-        try (BufferedReader br = new BufferedReader(new FileReader(SCHEDULE_FILE))) {
-            String line;
-            br.readLine(); // Skip header
-
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length < 5) {
-                    continue;
-                }
-
-                String doctorID = data[0].trim();
-                String date = data[1].trim();
-                String time = data[2].trim();
-                String status = data[3].trim();
-                String patientID = data[4].trim();
-
-                if (doctorID.equals(getUserID()) && status.equalsIgnoreCase("Available")) {
-                    availableSlots.add(new Schedule(doctorID, date, time, status, patientID.isEmpty() ? null : patientID));
-                }
+    // Expose this method as public to allow for updating the schedule
+    public void loadScheduleFromCSV() {
+        availableSlots.clear();
+        List<Schedule> allSchedules = Schedule.loadSchedulesFromCSV();
+        for (Schedule schedule : allSchedules) {
+            if (schedule.getDoctorID().equals(getUserID())) {
+                availableSlots.add(schedule);
             }
-        } catch (IOException e) {
-            System.err.println("Error loading available slots: " + e.getMessage());
         }
     }
 
-    // Get appointments for the doctor
+    public List<Schedule> getSchedule() {
+        return availableSlots;
+    }
+
     public List<Appointment> getAppointments() {
         return appointments;
     }
-    // Save updated appointments to Appointment.csv
+
     public void saveAppointments() {
         saveAppointmentsToCSV(appointments);
     }
@@ -173,45 +152,33 @@ public class Doctor extends User {
         }
     }
 
-
-    // View the doctor's schedule
     public void viewSchedule() {
         System.out.println("\n--- Doctor's Full Schedule ---");
-        try (BufferedReader br = new BufferedReader(new FileReader(SCHEDULE_FILE))) {
-            String line = br.readLine(); // Skip header
-            boolean hasSchedule = false;
+        boolean hasSchedule = false;
+        for (Schedule schedule : availableSlots) {
+            String date = schedule.getDate();
+            String time = schedule.getTime();
+            String status = schedule.getStatus();
+            String patientID = schedule.getPatientID() == null ? "N/A" : schedule.getPatientID();
+            System.out.println("Date: " + date + " | Time: " + time + " | Status: " + status + " | Patient ID: " + patientID);
+            hasSchedule = true;
+        }
 
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length >= 5 && data[0].equals(getUserID())) { // Check if DoctorID matches
-                    String date = data[1].trim();
-                    String time = data[2].trim();
-                    String status = data[3].trim();
-                    String patientID = data[4].isEmpty() ? "N/A" : data[4].trim();
-
-                    System.out.println("Date: " + date + " | Time: " + time + " | Status: " + status + " | Patient ID: " + patientID);
-                    hasSchedule = true;
-                }
-            }
-
-            if (!hasSchedule) {
-                System.out.println("No schedule found for Doctor ID: " + getUserID());
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading schedule: " + e.getMessage());
+        if (!hasSchedule) {
+            System.out.println("No schedule found for Doctor ID: " + getUserID());
         }
     }
 
-
-    // Set availability for a specific date and time
     public void setAvailability(String date, String time, String status) {
-        loadAvailableSlotsFromCSV();
+        loadScheduleFromCSV();
 
         boolean slotUpdated = false;
         for (Schedule slot : availableSlots) {
             if (slot.getDate().equals(date) && slot.getTime().equals(time)) {
                 slot.setStatus(status);
-                slot.setPatientID(null);
+                if (!"Booked".equalsIgnoreCase(status)) {
+                    slot.setPatientID(null);
+                }
                 slotUpdated = true;
                 break;
             }
@@ -221,13 +188,14 @@ public class Doctor extends User {
             availableSlots.add(new Schedule(getUserID(), date, time, status, null));
         }
 
-        Schedule.saveSchedulesToCSV(availableSlots);
+        List<Schedule> allSchedules = Schedule.loadSchedulesFromCSV();
+        allSchedules.removeIf(slot -> slot.getDoctorID().equals(getUserID()));
+        allSchedules.addAll(availableSlots);
+        Schedule.saveSchedulesToCSV(allSchedules);
+
         System.out.println("Slot updated or added: " + date + " | " + time + " | " + status);
     }
 
-
-
-    // Release a booked slot
     public void releaseSlot(String date, String time) {
         boolean slotReleased = false;
 
@@ -249,7 +217,6 @@ public class Doctor extends User {
         }
     }
 
-    // Display available slots for the doctor
     public void displayAvailableSlots() {
         System.out.println("\nAvailable Slots for Doctor ID: " + getUserID());
         if (availableSlots.isEmpty()) {
@@ -259,6 +226,13 @@ public class Doctor extends User {
                 System.out.println("Date: " + slot.getDate() + " | Time: " + slot.getTime());
             }
         }
+    }
+
+    public static void saveScheduleToCSV(String doctorID, List<Schedule> schedule) {
+        List<Schedule> allSchedules = Schedule.loadSchedulesFromCSV();
+        allSchedules.removeIf(slot -> slot.getDoctorID().equals(doctorID));
+        allSchedules.addAll(schedule);
+        Schedule.saveSchedulesToCSV(allSchedules);
     }
 
     @Override
@@ -271,4 +245,3 @@ public class Doctor extends User {
                 '}';
     }
 }
-

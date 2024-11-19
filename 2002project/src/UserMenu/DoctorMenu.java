@@ -1,12 +1,6 @@
 package UserMenu;
 
-import Info.Doctor;
-import Info.Appointment;
-import Info.MedicalRecord;
-import Info.Patient;
-import Info.Schedule;
-import Info.AppointmentOutcomeRecord;
-import Info.Prescription;
+import Info.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,7 +12,6 @@ public class DoctorMenu {
     private static Doctor currentDoctor; // The currently logged-in doctor
     private static List<Patient> patients; // The list of patients
     String patientFilePath = "2002project/Patient_List.csv"; // Replace with actual path
-
 
     public static void setDoctor(Doctor doctor, List<Patient> patientList) {
         currentDoctor = doctor;
@@ -175,16 +168,30 @@ public class DoctorMenu {
 
     private static void setAvailability(Scanner scanner) {
         System.out.println("\n--- Set Slot Availability ---");
-        System.out.print("Enter the date (YYYY-MM-DD): ");
-        String date = scanner.nextLine();
+        boolean addingSlots = true;
 
-        System.out.print("Enter the time (HH:MM): ");
-        String time = scanner.nextLine();
+        while (addingSlots) {
+            System.out.print("Enter the date (YYYY-MM-DD): ");
+            String date = scanner.nextLine();
 
-        System.out.print("Enter the status (Available/Unavailable): ");
-        String status = scanner.nextLine();
+            System.out.print("Enter the time (HH:MM): ");
+            String time = scanner.nextLine();
 
-        currentDoctor.setAvailability(date, time, status);
+            System.out.print("Enter the status (Available/Unavailable): ");
+            String status = scanner.nextLine();
+
+            currentDoctor.setAvailability(date, time, status);
+
+            System.out.print("Do you want to add another slot? (yes/no): ");
+            String response = scanner.nextLine();
+            if (response.equalsIgnoreCase("no")) {
+                addingSlots = false;
+            }
+        }
+
+        currentDoctor.loadScheduleFromCSV(); // Ensure schedule is up-to-date
+        Doctor.saveScheduleToCSV(currentDoctor.getUserID(), currentDoctor.getSchedule());
+        System.out.println("Availability slots updated successfully!");
     }
 
     private static void acceptOrDeclineAppointments(Scanner scanner) {
@@ -203,7 +210,7 @@ public class DoctorMenu {
                 if (response.equalsIgnoreCase("yes")) {
                     appointment.setStatus("Accepted");
                     System.out.println("Appointment accepted.");
-                 } else {
+                } else {
                     appointment.setStatus("Declined");
                     currentDoctor.releaseSlot(appointment.getDate(), appointment.getTime());
                     System.out.println("Appointment declined.");
@@ -338,7 +345,6 @@ public class DoctorMenu {
         return patientRecords;
     }
 
-
     // Save Patients to CSV
     public static void savePatientsToCSV(List<PatientRecord> patientRecords) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("Patient_List.csv"))) {
@@ -373,6 +379,4 @@ public class DoctorMenu {
         }
         PatientRecord.savePatientsToCSV(patientRecords);
     }
-
-
 }
